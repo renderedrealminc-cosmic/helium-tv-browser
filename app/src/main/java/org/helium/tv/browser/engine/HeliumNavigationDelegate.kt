@@ -20,8 +20,8 @@ class HeliumNavigationDelegate(
         private const val TAG = "HeliumNavigation"
     }
 
-    override fun onLoadError(session: GeckoSession, uri: String?, error: GeckoSession.NavigationDelegate.LoadError): GeckoResult<String>? {
-        Log.e(TAG, "Page load error for $uri: code=${error.code}, category=${error.category}")
+    override fun onLoadError(session: GeckoSession, uri: String?, error: org.mozilla.geckoview.WebRequestError): GeckoResult<String>? {
+        Log.e(TAG, "Page load error for $uri: $error")
         return null
     }
 

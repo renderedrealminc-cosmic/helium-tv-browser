@@ -128,9 +128,9 @@ class ExtensionManager(
     suspend fun toggleExtension(extension: WebExtension, enable: Boolean): Boolean = withContext(Dispatchers.Main) {
         try {
             if (enable) {
-                geckoRuntime.webExtensionController.enable(extension).poll(5000)
+                geckoRuntime.webExtensionController.enable(extension, 1).poll(5000)
             } else {
-                geckoRuntime.webExtensionController.disable(extension).poll(5000)
+                geckoRuntime.webExtensionController.disable(extension, 1).poll(5000)
             }
             true
         } catch (e: Exception) {
