@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focused state for TV Remote -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#238636" />
+            <stroke android:width="3dp" android:color="#58A6FF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <!-- Default state -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#21262D" />
+            <stroke android:width="1dp" android:color="#30363D" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

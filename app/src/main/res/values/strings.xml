@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Helium TV Browser</string>
+    <string name="default_search_engine">https://duckduckgo.com/?q=</string>
+</resources>
