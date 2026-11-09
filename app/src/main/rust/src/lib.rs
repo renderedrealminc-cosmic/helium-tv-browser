@@ -3,7 +3,7 @@ pub mod matcher;
 
 use cosmetic::CosmeticEngine;
 use jni::objects::{JClass, JString};
-use jni::sys::{jboolean, jint, JNI_FALSE, JNI_TRUE};
+use jni::sys::{jboolean, jint, jstring, JNI_FALSE, JNI_TRUE};
 use jni::JNIEnv;
 use matcher::{AdBlockEngine, ResourceType};
 use once_cell::sync::Lazy;
@@ -17,7 +17,6 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeIn
     _env: JNIEnv,
     _class: JClass,
 ) -> jboolean {
-    // Engine initializes lazily on first access
     let _ = ADBLOCK_ENGINE.read();
     let _ = COSMETIC_ENGINE.read();
     JNI_TRUE
@@ -131,7 +130,7 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeGe
     mut env: JNIEnv,
     _class: JClass,
     domain: JString,
-) -> JString {
+) -> jstring {
     let domain_str: String = match env.get_string(&domain) {
         Ok(s) => s.into(),
         Err(_) => String::new(),
@@ -144,8 +143,8 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeGe
     };
 
     match env.new_string(css) {
-        Ok(js) => js,
-        Err(_) => JString::default(),
+        Ok(js) => js.into_raw(),
+        Err(_) => std::ptr::null_mut(),
     }
 }
 
@@ -154,7 +153,7 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeGe
     mut env: JNIEnv,
     _class: JClass,
     domain: JString,
-) -> JString {
+) -> jstring {
     let domain_str: String = match env.get_string(&domain) {
         Ok(s) => s.into(),
         Err(_) => String::new(),
@@ -167,8 +166,8 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeGe
     };
 
     match env.new_string(script) {
-        Ok(js) => js,
-        Err(_) => JString::default(),
+        Ok(js) => js.into_raw(),
+        Err(_) => std::ptr::null_mut(),
     }
 }
 
