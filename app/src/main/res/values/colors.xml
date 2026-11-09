@@ -8,6 +8,16 @@
     <color name="glass_border">#30FFFFFF</color>
     <color name="glass_border_focused">#00E5FF</color>
 
+    <!-- Theme & System Color Compatibility -->
+    <color name="bg_dark">#08090C</color>
+    <color name="surface_dark">#121722</color>
+    <color name="card_dark">#1A2232</color>
+    <color name="accent_blue">#00E5FF</color>
+    <color name="accent_green">#00E676</color>
+    <color name="accent_red">#FF5252</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0B0C0</color>
+
     <!-- Neon & Liquid Accents -->
     <color name="liquid_cyan">#00E5FF</color>
     <color name="neon_purple">#B388FF</color>
