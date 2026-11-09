@@ -27,29 +27,29 @@ jobs:
           ndk-version: r26b
           add-to-path: true
 
-      - name: Set up Rust Toolchain
+      - name: Set up Rust Toolchain (TV ARM Targets)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi
 
       - name: Install cargo-ndk
         run: cargo install cargo-ndk
 
-      - name: Build Rust Native Library for Android
+      - name: Build Rust Native Library for Android TV
         run: |
           mkdir -p app/src/main/jniLibs
           cd app/src/main/rust
-          cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -o ../jniLibs build --release
+          cargo ndk -t arm64-v8a -t armeabi-v7a -o ../jniLibs build --release
 
       - name: Grant Execute Permission to gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK with Gradle
+      - name: Build Optimized TV APKs with Gradle (<50MB)
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK to GitHub Artifacts
+      - name: Upload APKs to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: HeliumTV-Browser-Debug-APK
+          name: HeliumTV-Browser-Optimized-APKs
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 14

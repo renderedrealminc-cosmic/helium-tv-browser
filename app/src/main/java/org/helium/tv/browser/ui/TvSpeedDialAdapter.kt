@@ -13,6 +13,7 @@ class TvSpeedDialAdapter(
 ) : RecyclerView.Adapter<TvSpeedDialAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val emojiText: TextView = view.findViewById(R.id.tvBookmarkEmoji)
         val titleText: TextView = view.findViewById(R.id.tvBookmarkTitle)
         val categoryText: TextView = view.findViewById(R.id.tvBookmarkCategory)
     }
@@ -25,15 +26,16 @@ class TvSpeedDialAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
+        holder.emojiText.text = item.emoji
         holder.titleText.text = item.title
         holder.categoryText.text = item.category
 
-        // TV Remote Focus animation
+        // Apple TV / Android TV Leanback focus animation
         holder.itemView.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
-                v.animate().scaleX(1.1f).scaleY(1.1f).translationZ(8f).setDuration(150).start()
+                v.animate().scaleX(1.15f).scaleY(1.15f).translationZ(12f).setDuration(160).start()
             } else {
-                v.animate().scaleX(1.0f).scaleY(1.0f).translationZ(0f).setDuration(150).start()
+                v.animate().scaleX(1.0f).scaleY(1.0f).translationZ(0f).setDuration(160).start()
             }
         }
 

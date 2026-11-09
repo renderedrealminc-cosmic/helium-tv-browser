@@ -4,7 +4,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1115">
+    android:background="@color/bg_oled_black">
 
     <!-- Mozilla GeckoView Engine Surface -->
     <org.mozilla.geckoview.GeckoView
@@ -14,142 +14,287 @@
         android:focusable="true"
         android:focusableInTouchMode="true" />
 
-    <!-- TV Speed Dial Home Screen Overlay -->
+    <!-- Modern Apple TV / FireTV Style Glassmorphic Home Screen -->
     <LinearLayout
         android:id="@+id/speedDialContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E60D1117"
+        android:background="#EE08090C"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="32dp">
+        android:padding="28dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎈 Helium TV"
+                android:textColor="@color/text_high_contrast"
+                android:textSize="38sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:background="@drawable/bg_gemini_button"
+                android:paddingStart="12dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="4dp"
+                android:text="✨ Gemini AI"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🎈 Helium TV Browser"
-            android:textColor="#58A6FF"
-            android:textSize="36sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="6dp"
+            android:text="Liquid Glass UI • Microsoft Bing Engine • Rust Adblocker • 4K Web"
+            android:textColor="@color/text_muted_glass"
+            android:textSize="15sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Rust + Kotlin Native Core • WebExtensions • AdBlock • Hybrid Mouse"
-            android:textColor="#8B949E"
-            android:textSize="16sp" />
-
+        <!-- Holographic Apple TV Style Speed Dial Cards -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/speedDialRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
 
-        <TextView
+        <!-- TV Remote Shortcuts Hint Bar -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="💡 TV Remote Shortcuts: [RED] Extensions • [GREEN] Mouse Cursor • [YELLOW] AdBlock • [BLUE] PiP • [MENU] Bar"
-            android:textColor="#7EE787"
-            android:textSize="14sp" />
+            android:layout_marginTop="28dp"
+            android:background="@drawable/bg_liquid_glass_pill"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎮 Remote Shortcuts: [RED] Extensions • [GREEN] Neon Pointer • [YELLOW] Adblock • [BLUE] PiP • [MENU] Bar"
+                android:textColor="@color/liquid_cyan"
+                android:textSize="13sp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Hybrid Virtual Mouse Pointer Overlay -->
+    <!-- Gemini AI Assistant Overlay Panel (Slide-in) -->
+    <LinearLayout
+        android:id="@+id/geminiPanel"
+        android:layout_width="480dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="#F010141E"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="✨ Gemini AI Assistant"
+                android:textColor="@color/neon_purple"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnCloseGemini"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_liquid_button"
+                android:text="✕ Close"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/etGeminiPrompt"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_liquid_button"
+            android:hint="Ask Gemini anything or summarize page..."
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="@color/text_muted_glass"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnQuickSummarize"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_liquid_button"
+                android:text="📄 Summarize Page"
+                android:textColor="@color/liquid_cyan"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnQuickHindi"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_liquid_button"
+                android:text="🌐 Hindi Me Samjhao"
+                android:textColor="@color/neon_purple"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvGeminiResponse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp"
+                android:text="Gemini AI ready to help! Ask any question or click Summarize Page above."
+                android:textColor="@color/text_high_contrast"
+                android:textSize="14sp" />
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- Hybrid Neon Ring Virtual Mouse Pointer Overlay -->
     <org.helium.tv.browser.input.VirtualMouseOverlay
         android:id="@+id/virtualMouseOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- TV Quick Bar / Navigation Toolbar -->
-    <LinearLayout
+    <!-- Floating Liquid Glass Pill Navigation Bar -->
+    <FrameLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:background="#F0161B22"
-        android:elevation="12dp"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:elevation="14dp"
+        android:padding="12dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_liquid_glass_pill"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
 
             <EditText
                 android:id="@+id/urlEditText"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:background="#21262D"
-                android:hint="Search with DuckDuckGo or enter URL..."
+                android:background="#25FFFFFF"
+                android:hint="🔍 Search with Microsoft Bing or enter URL..."
                 android:imeOptions="actionGo"
                 android:inputType="textUri"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:singleLine="true"
                 android:textColor="#FFFFFF"
-                android:textColorHint="#8B949E"
-                android:textSize="15sp" />
+                android:textColorHint="#90FFFFFF"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnGeminiAi"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_gemini_button"
+                android:focusable="true"
+                android:text="✨ Gemini"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnMouseToggle"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="6dp"
-                android:backgroundTint="#238636"
+                android:background="@drawable/bg_liquid_button"
                 android:focusable="true"
-                android:text="🖱️ Mouse: ON"
-                android:textColor="#FFFFFF"
+                android:text="🎯 Pointer: ON"
+                android:textColor="@color/liquid_cyan"
                 android:textSize="12sp" />
 
             <Button
                 android:id="@+id/btnAdblockStats"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="6dp"
-                android:backgroundTint="#DA3633"
+                android:background="@drawable/bg_liquid_button"
                 android:focusable="true"
                 android:text="🛡️ 0"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/neon_coral"
                 android:textSize="12sp" />
 
             <Button
                 android:id="@+id/btnExtensions"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="6dp"
-                android:backgroundTint="#1F6FEB"
+                android:background="@drawable/bg_liquid_button"
                 android:focusable="true"
-                android:text="🧩 Extensions"
+                android:text="🧩 Add-ons"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 
             <Button
                 android:id="@+id/btnUserAgent"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="6dp"
-                android:backgroundTint="#30363D"
+                android:background="@drawable/bg_liquid_button"
                 android:focusable="true"
                 android:text="UA: TV"
-                android:textColor="#C9D1D9"
+                android:textColor="@color/text_muted_glass"
                 android:textSize="12sp" />
 
             <Button
                 android:id="@+id/btnOpacity"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:backgroundTint="#30363D"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_liquid_button"
                 android:focusable="true"
                 android:text="Alpha: 100%"
-                android:textColor="#C9D1D9"
+                android:textColor="@color/text_muted_glass"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -157,12 +302,14 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:indeterminate="false"
             android:max="100"
             android:progressDrawable="@android:drawable/progress_horizontal"
             android:visibility="gone" />
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

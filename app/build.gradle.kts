@@ -17,13 +17,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a"))
         }
 
         externalNativeBuild {
             cmake {
                 arguments("-DANDROID_STL=c++_shared")
             }
+        }
+    }
+
+    // ABI Splits: Creates dedicated APK for TV ARM64 and ARMv7 (reduces size from 161MB to ~42MB!)
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
         }
     }
 

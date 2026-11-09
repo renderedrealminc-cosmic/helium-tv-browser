@@ -4,7 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.RadialGradient
+import android.graphics.Shader
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -14,9 +15,8 @@ import android.view.MotionEvent
 import android.view.View
 
 /**
- * High-precision Virtual Mouse Pointer Overlay for Android TV Remote.
- * Translates D-Pad directional controls into smooth, accelerated cursor movement
- * and dispatches synthetic touch/mouse MotionEvents to the underlying GeckoView.
+ * Futuristic Neon Ring Virtual Mouse Cursor for Android TV.
+ * Provides pixel-precise navigation on 10-foot TV screens with glowing visual feedback.
  */
 class VirtualMouseOverlay @JvmOverloads constructor(
     context: Context,
@@ -24,7 +24,7 @@ class VirtualMouseOverlay @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var cursorX = 960f // default center on 1080p
+    private var cursorX = 960f
     private var cursorY = 540f
     private var isCursorVisible = true
     private var isPressed = false
@@ -34,32 +34,34 @@ class VirtualMouseOverlay @JvmOverloads constructor(
     var targetView: View? = null
 
     // Movement Physics
-    private var velocityX = 0f
-    private var velocityY = 0f
-    private val baseSpeed = 14f
-    private val maxSpeed = 38f
+    private val baseSpeed = 15f
+    private val maxSpeed = 42f
     private val acceleration = 1.35f
     private var speedMultiplier = 1.0f
 
-    // Painting
-    private val cursorPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.WHITE
-        style = Paint.Style.FILL
-        setShadowLayer(8f, 2f, 2f, Color.argb(180, 0, 0, 0))
+    // Painting: Outer Neon Ring & Center Dot
+    private val outerRingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#00E5FF")
+        style = Paint.Style.STROKE
+        strokeWidth = 3.5f
+        setShadowLayer(14f, 0f, 0f, Color.parseColor("#8000E5FF"))
     }
 
-    private val cursorBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.BLACK
-        style = Paint.Style.STROKE
-        strokeWidth = 3f
+    private val innerGlowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3000E5FF")
+        style = Paint.Style.FILL
+    }
+
+    private val centerDotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        style = Paint.Style.FILL
+        setShadowLayer(6f, 0f, 0f, Color.WHITE)
     }
 
     private val clickRipplePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(120, 0, 180, 255)
+        color = Color.parseColor("#AA00E5FF")
         style = Paint.Style.FILL
     }
-
-    private val cursorPath = Path()
 
     // Smooth physics loop handler
     private val handler = Handler(Looper.getMainLooper())
@@ -97,20 +99,6 @@ class VirtualMouseOverlay @JvmOverloads constructor(
         setWillNotDraw(false)
         isFocusable = false
         isClickable = false
-        buildCursorPath()
-    }
-
-    private fun buildCursorPath() {
-        cursorPath.reset()
-        // Classic aerodynamic arrow cursor
-        cursorPath.moveTo(0f, 0f)
-        cursorPath.lineTo(0f, 32f)
-        cursorPath.lineTo(9f, 24f)
-        cursorPath.lineTo(16f, 38f)
-        cursorPath.lineTo(22f, 35f)
-        cursorPath.lineTo(15f, 21f)
-        cursorPath.lineTo(26f, 21f)
-        cursorPath.close()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -123,8 +111,6 @@ class VirtualMouseOverlay @JvmOverloads constructor(
         cursorX = x.coerceIn(0f, width.toFloat().coerceAtLeast(1f))
         cursorY = y.coerceIn(0f, height.toFloat().coerceAtLeast(1f))
         invalidate()
-
-        // Send hover/move event to web engine
         dispatchMotionEventToTarget(MotionEvent.ACTION_HOVER_MOVE, cursorX, cursorY)
     }
 
@@ -156,15 +142,14 @@ class VirtualMouseOverlay @JvmOverloads constructor(
                 return true
             }
 
-            // TV Remote Channel keys used for fast Page Scrolling
             KeyEvent.KEYCODE_PAGE_UP,
             KeyEvent.KEYCODE_CHANNEL_UP -> {
-                scrollPage(-400f)
+                scrollPage(-450f)
                 return true
             }
             KeyEvent.KEYCODE_PAGE_DOWN,
             KeyEvent.KEYCODE_CHANNEL_DOWN -> {
-                scrollPage(400f)
+                scrollPage(450f)
                 return true
             }
         }
@@ -203,14 +188,8 @@ class VirtualMouseOverlay @JvmOverloads constructor(
             now, now, MotionEvent.ACTION_SCROLL,
             cursorX, cursorY, 0
         )
-        // Set axis scroll value
-        motionEvent.axis(MotionEvent.AXIS_VSCROLL, if (deltaY > 0) -1.0f else 1.0f)
         targetView?.dispatchGenericMotionEvent(motionEvent)
         motionEvent.recycle()
-    }
-
-    private fun MotionEvent.axis(axis: Int, value: Float) {
-        // Helper for setting axis value
     }
 
     private fun dispatchMotionEventToTarget(action: Int, x: Float, y: Float) {
@@ -231,14 +210,23 @@ class VirtualMouseOverlay @JvmOverloads constructor(
         canvas.save()
         canvas.translate(cursorX, cursorY)
 
-        // Draw click ripple effect when pressed
+        val ringRadius = if (isPressed) 14f else 18f
+        val dotRadius = if (isPressed) 4f else 3.5f
+
+        // Pressed click ripple
         if (isPressed) {
-            canvas.drawCircle(6f, 6f, 22f, clickRipplePaint)
+            canvas.drawCircle(0f, 0f, 26f, clickRipplePaint)
         }
 
-        // Draw cursor
-        canvas.drawPath(cursorPath, cursorPaint)
-        canvas.drawPath(cursorPath, cursorBorderPaint)
+        // Inner glowing translucent core
+        canvas.drawCircle(0f, 0f, ringRadius, innerGlowPaint)
+
+        // Outer Neon Ring
+        canvas.drawCircle(0f, 0f, ringRadius, outerRingPaint)
+
+        // Precision Center White Dot
+        canvas.drawCircle(0f, 0f, dotRadius, centerDotPaint)
+
         canvas.restore()
     }
 

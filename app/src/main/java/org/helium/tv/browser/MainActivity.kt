@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.helium.tv.browser.adblock.FilterListManager
 import org.helium.tv.browser.adblock.RustAdBlocker
+import org.helium.tv.browser.ai.GeminiTvAssistant
 import org.helium.tv.browser.engine.GeckoEngineManager
 import org.helium.tv.browser.engine.HeliumContentBlockingDelegate
 import org.helium.tv.browser.engine.HeliumNavigationDelegate
@@ -50,21 +51,32 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var btnAdblockStats: Button
     private lateinit var btnUserAgent: Button
     private lateinit var btnOpacity: Button
+    private lateinit var btnGeminiAi: Button
     private lateinit var speedDialRecyclerView: RecyclerView
     private lateinit var speedDialContainer: View
 
+    // Gemini AI Panel
+    private lateinit var geminiPanel: View
+    private lateinit var btnCloseGemini: Button
+    private lateinit var etGeminiPrompt: EditText
+    private lateinit var btnQuickSummarize: Button
+    private lateinit var btnQuickHindi: Button
+    private lateinit var tvGeminiResponse: TextView
+
     private var currentUaMode = UserAgentMode.TV
+    private var currentPageTitle = ""
+    private var currentPageUrl = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initViews()
+        initGeminiPanel()
         initBrowserEngine()
         initTvControls()
         initSpeedDial()
 
-        // Load filter lists in background
         filterManager = FilterListManager(this)
         lifecycleScope.launch {
             filterManager.initializeFilters()
@@ -82,6 +94,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnAdblockStats = findViewById(R.id.btnAdblockStats)
         btnUserAgent = findViewById(R.id.btnUserAgent)
         btnOpacity = findViewById(R.id.btnOpacity)
+        btnGeminiAi = findViewById(R.id.btnGeminiAi)
         speedDialRecyclerView = findViewById(R.id.speedDialRecyclerView)
         speedDialContainer = findViewById(R.id.speedDialContainer)
 
@@ -105,6 +118,63 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             val alpha = pipManager.cycleTranslucency(findViewById(R.id.rootLayout))
             btnOpacity.text = "Alpha: ${(alpha * 100).toInt()}%"
         }
+        btnGeminiAi.setOnClickListener { toggleGeminiPanel() }
+    }
+
+    private fun initGeminiPanel() {
+        geminiPanel = findViewById(R.id.geminiPanel)
+        btnCloseGemini = findViewById(R.id.btnCloseGemini)
+        etGeminiPrompt = findViewById(R.id.etGeminiPrompt)
+        btnQuickSummarize = findViewById(R.id.btnQuickSummarize)
+        btnQuickHindi = findViewById(R.id.btnQuickHindi)
+        tvGeminiResponse = findViewById(R.id.tvGeminiResponse)
+
+        btnCloseGemini.setOnClickListener {
+            geminiPanel.visibility = View.GONE
+        }
+
+        etGeminiPrompt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND || actionId == EditorInfo.IME_ACTION_DONE) {
+                val query = etGeminiPrompt.text.toString().trim()
+                if (query.isNotEmpty()) {
+                    runGeminiQuery(query, "Page Title: $currentPageTitle | URL: $currentPageUrl")
+                }
+                true
+            } else {
+                false
+            }
+        }
+
+        btnQuickSummarize.setOnClickListener {
+            runGeminiQuery(
+                "Is web page ke mukhya points ko aasan 3-4 bullet points me summarize karo.",
+                "Title: $currentPageTitle | URL: $currentPageUrl"
+            )
+        }
+
+        btnQuickHindi.setOnClickListener {
+            runGeminiQuery(
+                "Is website ke baare me simple Hindi me explain karo ki ye page kis baare me hai.",
+                "Title: $currentPageTitle | URL: $currentPageUrl"
+            )
+        }
+    }
+
+    private fun toggleGeminiPanel() {
+        if (geminiPanel.visibility == View.VISIBLE) {
+            geminiPanel.visibility = View.GONE
+        } else {
+            geminiPanel.visibility = View.VISIBLE
+            etGeminiPrompt.requestFocus()
+        }
+    }
+
+    private fun runGeminiQuery(prompt: String, context: String) {
+        tvGeminiResponse.text = "⚡ Gemini soch raha hai..."
+        lifecycleScope.launch {
+            val reply = GeminiTvAssistant.queryGemini(prompt, context)
+            tvGeminiResponse.text = reply
+        }
     }
 
     private fun initBrowserEngine() {
@@ -115,6 +185,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             context = this,
             onPageStarted = { url ->
                 runOnUiThread {
+                    currentPageUrl = url
                     urlEditText.setText(url)
                     progressBar.visibility = View.VISIBLE
                     speedDialContainer.visibility = View.GONE
@@ -127,9 +198,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             },
             onTitleChanged = { title ->
                 runOnUiThread {
-                    if (!urlEditText.hasFocus()) {
-                        // Title updated
-                    }
+                    currentPageTitle = title
                 }
             },
             onProgressChanged = { progress ->
@@ -155,7 +224,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         geckoSession.open(engineManager.runtime)
         geckoView.setSession(geckoSession)
 
-        // Bind virtual mouse to geckoView
         virtualMouseOverlay.targetView = geckoView
     }
 
@@ -171,12 +239,14 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     private fun loadUrl(rawInput: String) {
+        // Microsoft Bing as default search engine
         val url = when {
             rawInput.startsWith("http://") || rawInput.startsWith("https://") -> rawInput
             rawInput.contains(".") && !rawInput.contains(" ") -> "https://$rawInput"
-            else -> "https://duckduckgo.com/?q=${android.net.Uri.encode(rawInput)}"
+            else -> "https://www.bing.com/search?q=${android.net.Uri.encode(rawInput)}"
         }
         urlEditText.setText(url)
+        currentPageUrl = url
         geckoSession.loadUri(url)
         speedDialContainer.visibility = View.GONE
     }
@@ -193,7 +263,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         Toast.makeText(this, "Switched to ${currentUaMode.name} User-Agent", Toast.LENGTH_SHORT).show()
     }
 
-    // Key dispatching for TV Remote
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_DOWN) {
             if (tvKeyHandler.onKeyDown(event.keyCode, event)) return true
@@ -203,13 +272,12 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         return super.dispatchKeyEvent(event)
     }
 
-    // TvActionListener callbacks
     override fun onToggleMousePointer() {
         val active = virtualMouseOverlay.toggleMousePointer()
-        btnMouseToggle.text = if (active) "🖱️ Mouse: ON" else "🎯 Focus Mode"
+        btnMouseToggle.text = if (active) "🎯 Pointer: ON" else "🎯 Focus Mode"
         Toast.makeText(
             this,
-            if (active) "Virtual Mouse Pointer Activated" else "D-Pad Focus Mode Activated",
+            if (active) "Neon Pointer Activated" else "D-Pad Focus Mode Activated",
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -220,7 +288,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     override fun onToggleAdBlocker() {
         val count = RustAdBlocker.getBlockedCount()
-        Toast.makeText(this, "Rust AdBlocker: $count ads/trackers blocked so far", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Rust AdBlocker: $count ads & trackers blocked", Toast.LENGTH_SHORT).show()
     }
 
     override fun onTogglePipMode() {
@@ -232,12 +300,15 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     override fun onNavigateBack(): Boolean {
+        if (geminiPanel.visibility == View.VISIBLE) {
+            geminiPanel.visibility = View.GONE
+            return true
+        }
         if (toolbarContainer.visibility == View.VISIBLE) {
             toolbarContainer.visibility = View.GONE
             return true
         }
         if (speedDialContainer.visibility == View.GONE) {
-            // Try going back in web history
             geckoSession.goBack()
             return true
         }
@@ -245,7 +316,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     override fun onMediaKey(keyCode: Int): Boolean {
-        // Can send javascript media control
         return true
     }
 
@@ -255,6 +325,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         if (isInPictureInPictureMode) {
             toolbarContainer.visibility = View.GONE
             virtualMouseOverlay.visibility = View.GONE
+            geminiPanel.visibility = View.GONE
         } else {
             virtualMouseOverlay.visibility = View.VISIBLE
         }

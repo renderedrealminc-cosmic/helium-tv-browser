@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="160dp"
-    android:layout_height="100dp"
-    android:layout_margin="8dp"
+    android:layout_width="190dp"
+    android:layout_height="125dp"
+    android:layout_margin="10dp"
     android:background="@drawable/bg_speed_dial_item"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvBookmarkEmoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌐"
+        android:textSize="28sp" />
 
     <TextView
         android:id="@+id/tvBookmarkTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Bookmark"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:text="Microsoft Bing"
+        android:textColor="@color/text_high_contrast"
+        android:textSize="17sp"
         android:textStyle="bold" />
 
     <TextView
@@ -26,10 +34,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Category"
-        android:textColor="#8B949E"
-        android:textSize="13sp" />
+        android:background="#20FFFFFF"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:text="Search"
+        android:textColor="@color/text_muted_glass"
+        android:textSize="11sp" />
 
 </LinearLayout>
