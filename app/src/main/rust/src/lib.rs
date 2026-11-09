@@ -17,8 +17,8 @@ pub extern "system" fn Java_org_helium_tv_browser_adblock_RustAdBlocker_nativeIn
     _env: JNIEnv,
     _class: JClass,
 ) -> jboolean {
-    let _ = ADBLOCK_ENGINE.read();
-    let _ = COSMETIC_ENGINE.read();
+    drop(ADBLOCK_ENGINE.read());
+    drop(COSMETIC_ENGINE.read());
     JNI_TRUE
 }
 
