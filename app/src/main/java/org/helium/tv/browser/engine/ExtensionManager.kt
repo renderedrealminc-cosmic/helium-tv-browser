@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.WebExtension
 import java.io.File
@@ -58,7 +57,7 @@ class ExtensionManager(
                             name = meta.name ?: ext.id,
                             version = meta.version ?: "1.0",
                             description = meta.description ?: "",
-                            isEnabled = ext.flags and WebExtension.Flags.ALLOW_CONTENT_MESSAGING != 0,
+                            isEnabled = (ext.flags and WebExtension.Flags.ALLOW_CONTENT_MESSAGING.toLong()) != 0L,
                             rawExtension = ext
                         )
                     )
@@ -129,9 +128,9 @@ class ExtensionManager(
     suspend fun toggleExtension(extension: WebExtension, enable: Boolean): Boolean = withContext(Dispatchers.Main) {
         try {
             if (enable) {
-                geckoRuntime.webExtensionController.enable(extension, WebExtension.EnableSource.USER).poll(5000)
+                geckoRuntime.webExtensionController.enable(extension).poll(5000)
             } else {
-                geckoRuntime.webExtensionController.disable(extension, WebExtension.DisableSource.USER).poll(5000)
+                geckoRuntime.webExtensionController.disable(extension).poll(5000)
             }
             true
         } catch (e: Exception) {
