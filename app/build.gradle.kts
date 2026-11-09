@@ -27,6 +27,19 @@ android {
         }
     }
 
+    externalNativeBuild {
+        cmake {
+            path = file("CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -52,8 +65,8 @@ android {
 }
 
 dependencies {
-    // Mozilla GeckoView - Full WebExtension (.crx/.xpi) & modern web rendering engine
-    implementation("org.mozilla.geckoview:geckoview-omni:121.0.20240108170212")
+    // Mozilla GeckoView - Verified Working Release from Mozilla Maven
+    implementation("org.mozilla.geckoview:geckoview-omni:99.0.20220411174855")
 
     // Android TV & UI support
     implementation("androidx.appcompat:appcompat:1.6.1")

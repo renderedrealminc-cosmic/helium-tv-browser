@@ -35,6 +35,12 @@ jobs:
       - name: Install cargo-ndk
         run: cargo install cargo-ndk
 
+      - name: Build Rust Native Library for Android
+        run: |
+          mkdir -p app/src/main/jniLibs
+          cd app/src/main/rust
+          cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -o ../jniLibs build --release
+
       - name: Grant Execute Permission to gradlew
         run: chmod +x gradlew
 
