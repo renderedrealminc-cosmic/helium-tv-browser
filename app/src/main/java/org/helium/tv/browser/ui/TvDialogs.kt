@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import org.helium.tv.browser.extensions.ExtensionManager
 import org.helium.tv.browser.search.OpenSearchManager
 import org.helium.tv.browser.search.SearchEngine
 import org.helium.tv.browser.settings.HomeLayoutMode
@@ -12,6 +13,121 @@ import org.helium.tv.browser.settings.WallpaperTheme
 
 object TvDialogs {
     private const val TAG = "TvDialogs"
+
+    /**
+     * Modern Apple Liquid Glass Confirmation Popup for installing a Chrome extension.
+     */
+    fun showAddExtensionDialog(
+        context: Context,
+        extensionName: String,
+        extensionId: String,
+        onConfirm: () -> Unit,
+        onCancel: (() -> Unit)? = null
+    ) {
+        try {
+            val message = "Do you want to add \"$extensionName\" to Helium?\n\n" +
+                    "It can:\n" +
+                    "• Read and change all your data on the websites you visit\n" +
+                    "• Modify web page content and block requests"
+
+            val dialog = AlertDialog.Builder(context)
+                .setTitle("🧩 Add Extension to Helium?")
+                .setMessage(message)
+                .setPositiveButton("Add Extension") { d, _ ->
+                    d.dismiss()
+                    onConfirm()
+                }
+                .setNegativeButton("Cancel") { d, _ ->
+                    d.dismiss()
+                    onCancel?.invoke()
+                }
+                .create()
+
+            dialog.window?.setBackgroundDrawableResource(org.helium.tv.browser.R.drawable.bg_liquid_glass_dialog)
+            dialog.show()
+        } catch (t: Throwable) {
+            Log.e(TAG, "Failed showing add extension dialog", t)
+        }
+    }
+
+    /**
+     * Extension Manager dialog showing installed extensions with ON/OFF switch & uninstall.
+     */
+    fun showExtensionsManagerDialog(
+        context: Context,
+        extensionManager: ExtensionManager,
+        onOpenWebStore: () -> Unit,
+        onRefresh: () -> Unit
+    ) {
+        try {
+            val installed = extensionManager.getInstalledExtensions()
+            val items = mutableListOf<String>()
+
+            if (installed.isEmpty()) {
+                items.add("No extensions installed yet")
+            } else {
+                for (ext in installed) {
+                    val status = if (ext.enabled) "✅ Active" else "⏸️ Disabled"
+                    items.add("${ext.name} ($status)")
+                }
+            }
+            items.add("🌐 Open Chrome Web Store")
+
+            AlertDialog.Builder(context)
+                .setTitle("🧩 Extensions Manager (${installed.size})")
+                .setItems(items.toTypedArray()) { dialog, which ->
+                    dialog.dismiss()
+                    if (installed.isEmpty()) {
+                        if (which == 1) onOpenWebStore()
+                    } else {
+                        if (which < installed.size) {
+                            val selected = installed[which]
+                            showExtensionOptions(context, selected.id, selected.name, selected.enabled, extensionManager) {
+                                onRefresh()
+                            }
+                        } else {
+                            onOpenWebStore()
+                        }
+                    }
+                }
+                .setNegativeButton("Close", null)
+                .show()
+        } catch (t: Throwable) {
+            Log.e(TAG, "Failed showing extension manager dialog", t)
+        }
+    }
+
+    private fun showExtensionOptions(
+        context: Context,
+        extId: String,
+        extName: String,
+        currentlyEnabled: Boolean,
+        extensionManager: ExtensionManager,
+        onChanged: () -> Unit
+    ) {
+        val toggleAction = if (currentlyEnabled) "⏸️ Disable Extension" else "▶️ Enable Extension"
+        val options = arrayOf(toggleAction, "🗑️ Remove / Uninstall")
+
+        AlertDialog.Builder(context)
+            .setTitle(extName)
+            .setItems(options) { dialog, which ->
+                dialog.dismiss()
+                when (which) {
+                    0 -> {
+                        extensionManager.setExtensionEnabled(extId, !currentlyEnabled)
+                        Toast.makeText(context, "$extName: ${if (!currentlyEnabled) "Enabled" else "Disabled"}", Toast.LENGTH_SHORT).show()
+                        onChanged()
+                    }
+                    1 -> {
+                        extensionManager.uninstallExtension(extId)
+                        Toast.makeText(context, "Uninstalled $extName", Toast.LENGTH_SHORT).show()
+                        onChanged()
+                    }
+                }
+            }
+            .setNegativeButton("Back", null)
+            .show()
+    }
 
     fun showSettingsDialog(
         context: Context,
@@ -133,11 +249,13 @@ object TvDialogs {
         onPipClick: () -> Unit,
         onReloadClick: () -> Unit,
         onClearDataClick: () -> Unit,
-        onSettingsClick: () -> Unit
+        onSettingsClick: () -> Unit,
+        onExtensionsClick: () -> Unit
     ) {
         try {
             val options = arrayOf(
                 "⚙️ Settings & Customization",
+                "🧩 Extensions Manager",
                 "✨ Gemini AI Assistant",
                 "🎯 Toggle Mouse Pointer",
                 "🖥️ Switch User-Agent (TV / Desktop / Mobile)",
@@ -153,13 +271,14 @@ object TvDialogs {
                     try {
                         when (which) {
                             0 -> onSettingsClick()
-                            1 -> onGeminiClick()
-                            2 -> onPointerToggle()
-                            3 -> onUserAgentClick()
-                            4 -> onSearchEngineClick()
-                            5 -> onPipClick()
-                            6 -> onReloadClick()
-                            7 -> onClearDataClick()
+                            1 -> onExtensionsClick()
+                            2 -> onGeminiClick()
+                            3 -> onPointerToggle()
+                            4 -> onUserAgentClick()
+                            5 -> onSearchEngineClick()
+                            6 -> onPipClick()
+                            7 -> onReloadClick()
+                            8 -> onClearDataClick()
                         }
                     } catch (t: Throwable) {
                         Log.e(TAG, "Error in menu action", t)

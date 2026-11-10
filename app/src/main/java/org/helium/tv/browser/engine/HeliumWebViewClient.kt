@@ -12,21 +12,30 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import kotlinx.coroutines.runBlocking
 import org.helium.tv.browser.adblock.RustAdBlocker
+import org.helium.tv.browser.extensions.ExtensionManager
 import java.io.ByteArrayInputStream
+import java.util.regex.Pattern
 
 /**
- * Chromium WebView Client with Rust Adblock integration and crash-proof error recovery.
+ * Chromium WebView Client with Rust Adblock, Chrome Web Store extension interception,
+ * content script injection, and crash-proof error recovery.
  */
 class HeliumWebViewClient(
     private val context: Context,
+    private val extensionManager: ExtensionManager,
     private val onPageStarted: (url: String) -> Unit,
     private val onPageFinished: (url: String) -> Unit,
     private val onError: (failingUrl: String, description: String) -> Unit,
-    private val onBlockedResource: (count: Int) -> Unit
+    private val onBlockedResource: (count: Int) -> Unit,
+    private val onExtensionPrompt: (id: String, name: String) -> Unit
 ) : WebViewClient() {
 
     companion object {
         private const val TAG = "HeliumWebViewClient"
+        private val STORE_DETAIL_PATTERN = Pattern.compile(
+            "https?://(chromewebstore|chrome)\\.google\\.com/(webstore/)?detail/([^/?#]+)/([a-p]{32})",
+            Pattern.CASE_INSENSITIVE
+        )
     }
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -37,7 +46,6 @@ class HeliumWebViewClient(
             if (shouldBlock) {
                 val count = RustAdBlocker.getBlockedCount()
                 onBlockedResource(count)
-                // Return empty response to block ads, scripts, and trackers
                 return WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0)))
             }
         } catch (t: Throwable) {
@@ -49,11 +57,23 @@ class HeliumWebViewClient(
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         val uri = request?.url ?: return false
+        val urlStr = uri.toString()
         val scheme = uri.scheme?.lowercase() ?: ""
+
+        // Check if URL is an extension CRX download or installation trigger
+        if (urlStr.endsWith(".crx", ignoreCase = true) || urlStr.contains("clients2.google.com/service/update2/crx", ignoreCase = true)) {
+            val extId = uri.getQueryParameter("x")?.substringAfter("id%3D")?.substringBefore("%26")
+                ?: uri.getQueryParameter("id")
+                ?: urlStr.substringAfterLast("/").substringBefore(".crx")
+            if (extId.length == 32) {
+                onExtensionPrompt(extId, "Chrome Extension")
+                return true // Handled via native install popup
+            }
+        }
 
         // Keep standard web schemes safely inside the WebView
         if (scheme == "http" || scheme == "https" || scheme == "about" || scheme == "javascript") {
-            return false // Let WebView load it
+            return false
         }
 
         // For non-web schemes (intent://, tel:, etc.), handle safely without crashing
@@ -78,24 +98,97 @@ class HeliumWebViewClient(
 
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
-        if (!url.isNullOrEmpty()) {
-            onPageFinished(url)
-            // Inject Rust cosmetic ad-hiding CSS
-            try {
-                val host = Uri.parse(url).host ?: ""
-                if (host.isNotEmpty()) {
-                    val cosmeticCss = runBlocking { RustAdBlocker.getCosmeticScriptForDomain(host) }
-                    if (cosmeticCss.isNotEmpty()) {
-                        val cleanCss = cosmeticCss.replace("'", "\\'")
-                        view?.evaluateJavascript(
-                            "(function(){var s=document.createElement('style');s.innerHTML='$cleanCss';document.head.appendChild(s);})();",
-                            null
-                        )
-                    }
+        if (url.isNullOrEmpty()) return
+
+        onPageFinished(url)
+
+        // 1. Inject Rust cosmetic ad-hiding CSS
+        try {
+            val host = Uri.parse(url).host ?: ""
+            if (host.isNotEmpty()) {
+                val cosmeticCss = runBlocking { RustAdBlocker.getCosmeticScriptForDomain(host) }
+                if (cosmeticCss.isNotEmpty()) {
+                    val cleanCss = cosmeticCss.replace("'", "\\'")
+                    view?.evaluateJavascript(
+                        "(function(){var s=document.createElement('style');s.innerHTML='$cleanCss';document.head.appendChild(s);})();",
+                        null
+                    )
                 }
-            } catch (t: Throwable) {
-                // ignore
             }
+        } catch (t: Throwable) {
+            // ignore
+        }
+
+        // 2. Inject Installed Chrome Extensions Content Scripts
+        try {
+            val scripts = extensionManager.getScriptsToInject(url)
+            for (script in scripts) {
+                view?.evaluateJavascript(script, null)
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "Error executing extension content scripts", t)
+        }
+
+        // 3. Detect Chrome Web Store Extension Details Page & Inject Liquid Glass Add Button
+        try {
+            val matcher = STORE_DETAIL_PATTERN.matcher(url)
+            if (matcher.find()) {
+                val slug = matcher.group(3) ?: "Extension"
+                val extId = matcher.group(4) ?: ""
+                val cleanName = slug.split("-").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+
+                // Inject floating Liquid Glass "Add Extension to Helium" bar & button on Chrome Web Store
+                val injectScript = """
+                    (function() {
+                        if (document.getElementById('helium-ext-banner')) return;
+                        var banner = document.createElement('div');
+                        banner.id = 'helium-ext-banner';
+                        banner.style.position = 'fixed';
+                        banner.style.bottom = '70px';
+                        banner.style.right = '20px';
+                        banner.style.zIndex = '99999999';
+                        banner.style.background = 'rgba(20, 22, 32, 0.88)';
+                        banner.style.backdropFilter = 'blur(16px)';
+                        banner.style.border = '1.5px solid rgba(255, 255, 255, 0.25)';
+                        banner.style.borderRadius = '24px';
+                        banner.style.padding = '10px 18px';
+                        banner.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.5)';
+                        banner.style.cursor = 'pointer';
+                        banner.style.display = 'flex';
+                        banner.style.alignItems = 'center';
+                        banner.style.color = '#FFFFFF';
+                        banner.style.fontFamily = '-apple-system, BlinkMacSystemFont, sans-serif';
+                        banner.style.fontSize = '14px';
+                        banner.style.fontWeight = 'bold';
+                        banner.innerHTML = '🧩 Add to Helium Browser';
+                        banner.onclick = function() {
+                            if (window.HeliumExtensionBridge) {
+                                window.HeliumExtensionBridge.requestInstall('$extId', '$cleanName');
+                            }
+                        };
+                        document.body.appendChild(banner);
+
+                        // Hook into any page Add to Chrome buttons
+                        var buttons = document.querySelectorAll('button');
+                        for (var i = 0; i < buttons.length; i++) {
+                            var text = buttons[i].innerText || '';
+                            if (text.includes('Add to Chrome') || text.includes('Add to Brave') || text.includes('Get')) {
+                                buttons[i].onclick = function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (window.HeliumExtensionBridge) {
+                                        window.HeliumExtensionBridge.requestInstall('$extId', '$cleanName');
+                                    }
+                                };
+                            }
+                        }
+                    })();
+                """.trimIndent()
+
+                view?.evaluateJavascript(injectScript, null)
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "Error injecting Chrome Web Store banner", t)
         }
     }
 
@@ -111,6 +204,6 @@ class HeliumWebViewClient(
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
         Log.e(TAG, "WebView render process crashed: didCrash=${detail?.didCrash()}")
         onError(view?.url ?: "", "Render process crashed. Tap Retry to reload.")
-        return true // Handled safely without killing the entire app!
+        return true
     }
 }

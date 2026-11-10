@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Button
@@ -24,12 +25,14 @@ import org.helium.tv.browser.ai.GeminiTvAssistant
 import org.helium.tv.browser.engine.HeliumWebChromeClient
 import org.helium.tv.browser.engine.HeliumWebViewClient
 import org.helium.tv.browser.engine.TvNativeCore
+import org.helium.tv.browser.extensions.ExtensionManager
 import org.helium.tv.browser.input.TvActionListener
 import org.helium.tv.browser.input.TvKeyHandler
 import org.helium.tv.browser.input.VirtualMouseOverlay
 import org.helium.tv.browser.pip.FloatingPipManager
 import org.helium.tv.browser.search.OpenSearchManager
 import org.helium.tv.browser.settings.PreferencesManager
+import org.helium.tv.browser.ui.LiquidGlassUtils
 import org.helium.tv.browser.ui.TvDialogs
 import org.helium.tv.browser.utils.UserAgentMode
 import org.helium.tv.browser.utils.UserAgentUtils
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         const val HOME_URL = "https://www.bing.com"
         const val GOOGLE_URL = "https://www.google.com"
         const val YOUTUBE_URL = "https://www.youtube.com"
+        const val STORE_URL = "https://chromewebstore.google.com"
     }
 
     private lateinit var rootLayout: View
@@ -51,9 +55,11 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var filterManager: FilterListManager
     private lateinit var openSearchManager: OpenSearchManager
     private lateinit var preferencesManager: PreferencesManager
+    private lateinit var extensionManager: ExtensionManager
 
-    // Top Chromium Omnibox Bar Views
+    // Top Apple-style Liquid Glass Omnibox Bar Views
     private lateinit var topBar: View
+    private lateinit var omniboxContainer: View
     private lateinit var btnBack: ImageButton
     private lateinit var btnForward: ImageButton
     private lateinit var btnReload: ImageButton
@@ -70,6 +76,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var alohaMobileContainer: View
 
     // TV Layout Elements
+    private lateinit var centerSearchContainer: View
     private lateinit var etCenterSearch: EditText
     private lateinit var btnShortcutBing: ImageButton
     private lateinit var btnShortcutGoogle: ImageButton
@@ -77,6 +84,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var btnShortcutGemini: ImageButton
 
     // Aloha Mobile Layout Elements
+    private lateinit var alohaSearchContainer: View
     private lateinit var btnAlohaGift: ImageButton
     private lateinit var btnAlohaQr: ImageButton
     private lateinit var btnAlohaSettings: ImageButton
@@ -132,12 +140,22 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private var currentPageUrl = ""
     private var lastFailedUrl = ""
 
+    inner class HeliumExtensionBridge {
+        @JavascriptInterface
+        fun requestInstall(extensionId: String, extensionName: String) {
+            runOnUiThread {
+                promptAddExtension(extensionId, extensionName)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         preferencesManager = PreferencesManager(this)
         openSearchManager = OpenSearchManager(this)
+        extensionManager = ExtensionManager(this)
 
         initViews()
         initGeminiPanel()
@@ -153,7 +171,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             }
         }
 
-        // Apply theme, home screen layout & search engine
         returnToHome()
     }
 
@@ -165,6 +182,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
         // Top Omnibox Bar
         topBar = findViewById(R.id.topBar)
+        omniboxContainer = findViewById(R.id.omniboxContainer)
         btnBack = findViewById(R.id.btnBack)
         btnForward = findViewById(R.id.btnForward)
         btnReload = findViewById(R.id.btnReload)
@@ -181,6 +199,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         alohaMobileContainer = findViewById(R.id.alohaMobileContainer)
 
         // TV Layout Views
+        centerSearchContainer = findViewById(R.id.centerSearchContainer)
         etCenterSearch = findViewById(R.id.etCenterSearch)
         btnShortcutBing = findViewById(R.id.btnShortcutBing)
         btnShortcutGoogle = findViewById(R.id.btnShortcutGoogle)
@@ -188,6 +207,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnShortcutGemini = findViewById(R.id.btnShortcutGemini)
 
         // Aloha Mobile Header Views
+        alohaSearchContainer = findViewById(R.id.alohaSearchContainer)
         btnAlohaGift = findViewById(R.id.btnAlohaGift)
         btnAlohaQr = findViewById(R.id.btnAlohaQr)
         btnAlohaSettings = findViewById(R.id.btnAlohaSettings)
@@ -230,7 +250,37 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnRetry = findViewById(R.id.btnRetry)
         btnErrorHome = findViewById(R.id.btnErrorHome)
 
+        // Apply Native Android RenderEffect Blur (API 31+ with fallback)
+        LiquidGlassUtils.applyBlur(topBar, 20f, 20f)
+        LiquidGlassUtils.applyBlur(mobileNavBar, 20f, 20f)
+
+        // Attach 150ms smooth spring/ease-out animations
+        attachLiquidAnimations()
+
         setupListeners()
+    }
+
+    private fun attachLiquidAnimations() {
+        val buttonsToAnimate = listOf(
+            btnBack, btnForward, btnReload, btnHome, btnShieldLayout, btnMenu,
+            btnShortcutBing, btnShortcutGoogle, btnShortcutYoutube, btnShortcutGemini,
+            btnAlohaGift, btnAlohaQr, btnAlohaSettings, btnAlohaShield, btnAlohaAi,
+            tileGoogle, tileX, tileEbay, tileBooking, tileSkyscanner, tileWeather, tileYoutube, tileAdd,
+            pillHot, pillNews, pillEntertainment, pillSports, pillMoney,
+            btnNavBack, btnNavHome, btnNavMenu, btnNavDownloads, btnNavTabs, btnNavSettings
+        )
+        buttonsToAnimate.forEach { LiquidGlassUtils.attachTouchFeedback(it) }
+
+        // Animate search pill expansion on focus
+        etOmnibox.setOnFocusChangeListener { _, hasFocus ->
+            LiquidGlassUtils.animatePillFocus(omniboxContainer, hasFocus)
+        }
+        etCenterSearch.setOnFocusChangeListener { _, hasFocus ->
+            LiquidGlassUtils.animatePillFocus(centerSearchContainer, hasFocus)
+        }
+        etAlohaSearch.setOnFocusChangeListener { _, hasFocus ->
+            LiquidGlassUtils.animatePillFocus(alohaSearchContainer, hasFocus)
+        }
     }
 
     private fun setupListeners() {
@@ -276,21 +326,10 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         }
 
         // TV Shortcuts
-        btnShortcutBing.setOnClickListener {
-            safelyRun { loadUrl(HOME_URL) }
-        }
-
-        btnShortcutGoogle.setOnClickListener {
-            safelyRun { loadUrl(GOOGLE_URL) }
-        }
-
-        btnShortcutYoutube.setOnClickListener {
-            safelyRun { loadUrl(YOUTUBE_URL) }
-        }
-
-        btnShortcutGemini.setOnClickListener {
-            safelyRun { toggleGeminiPanel() }
-        }
+        btnShortcutBing.setOnClickListener { safelyRun { loadUrl(HOME_URL) } }
+        btnShortcutGoogle.setOnClickListener { safelyRun { loadUrl(GOOGLE_URL) } }
+        btnShortcutYoutube.setOnClickListener { safelyRun { loadUrl(YOUTUBE_URL) } }
+        btnShortcutGemini.setOnClickListener { safelyRun { toggleGeminiPanel() } }
 
         // Aloha Header Buttons
         btnAlohaGift.setOnClickListener {
@@ -313,13 +352,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             }
         }
 
-        btnAlohaShield.setOnClickListener {
-            safelyRun { onToggleAdBlocker() }
-        }
-
-        btnAlohaAi.setOnClickListener {
-            safelyRun { toggleGeminiPanel() }
-        }
+        btnAlohaShield.setOnClickListener { safelyRun { onToggleAdBlocker() } }
+        btnAlohaAi.setOnClickListener { safelyRun { toggleGeminiPanel() } }
 
         // Aloha Shortcut Tiles
         tileGoogle.setOnClickListener { safelyRun { loadUrl(GOOGLE_URL) } }
@@ -416,6 +450,27 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         }
     }
 
+    fun promptAddExtension(extensionId: String, extensionName: String) {
+        TvDialogs.showAddExtensionDialog(
+            context = this,
+            extensionName = extensionName,
+            extensionId = extensionId,
+            onConfirm = {
+                Toast.makeText(this, "⏳ Downloading & Installing \"$extensionName\"...", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    val result = extensionManager.installExtension(extensionId, extensionName)
+                    if (result.isSuccess) {
+                        val ext = result.getOrNull()
+                        Toast.makeText(this@MainActivity, "✅ \"${ext?.name ?: extensionName}\" added to Helium! 🎉", Toast.LENGTH_LONG).show()
+                    } else {
+                        val err = result.exceptionOrNull()?.message ?: "Unknown error"
+                        Toast.makeText(this@MainActivity, "❌ Could not install extension: $err", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        )
+    }
+
     private fun applyUserPreferences() {
         safelyRun {
             // 1. Set root wallpaper background
@@ -427,7 +482,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 edgeArcTvContainer.visibility = View.GONE
                 mobileNavBar.visibility = View.VISIBLE
                 virtualMouseOverlay.visibility = View.GONE
-                // On mobile home screen, Aloha header serves as search bar
                 topBar.visibility = if (webView.visibility == View.VISIBLE) View.VISIBLE else View.GONE
             } else {
                 alohaMobileContainer.visibility = View.GONE
@@ -464,8 +518,20 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             // Hardware acceleration
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
+            // Bridge for Chrome Web Store extension installs
+            webView.addJavascriptInterface(HeliumExtensionBridge(), "HeliumExtensionBridge")
+
+            // Auto-detect .crx extension downloads
+            webView.setDownloadListener { url, _, _, mimetype, _ ->
+                if (url.endsWith(".crx", ignoreCase = true) || mimetype == "application/x-chrome-extension") {
+                    val extId = url.substringAfterLast("/").substringBefore(".crx")
+                    promptAddExtension(extId, "Chrome Extension")
+                }
+            }
+
             webView.webViewClient = HeliumWebViewClient(
                 context = this,
+                extensionManager = extensionManager,
                 onPageStarted = { url ->
                     runOnUiThread {
                         currentPageUrl = url
@@ -504,6 +570,11 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                             tvAlohaShieldCount.text = "$count"
                         }
                     }
+                },
+                onExtensionPrompt = { id, name ->
+                    runOnUiThread {
+                        promptAddExtension(id, name)
+                    }
                 }
             )
 
@@ -522,7 +593,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                     }
                 },
                 onCustomViewToggled = { customView, _ ->
-                    // Fullscreen video toggle
                     if (customView != null) {
                         topBar.visibility = View.GONE
                         mobileNavBar.visibility = View.GONE
@@ -548,6 +618,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnQuickSummarize = findViewById(R.id.btnQuickSummarize)
         btnQuickHindi = findViewById(R.id.btnQuickHindi)
         tvGeminiResponse = findViewById(R.id.tvGeminiResponse)
+
+        LiquidGlassUtils.applyBlur(geminiPanel, 24f, 24f)
 
         btnCloseGemini.setOnClickListener {
             geminiPanel.visibility = View.GONE
@@ -609,28 +681,19 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         tvKeyHandler = TvKeyHandler(virtualMouseOverlay, this)
     }
 
-    /**
-     * Bing Search & URL Logic specified by User:
-     * - Trims extra spaces.
-     * - If starts with http:// or https:// or looks like a valid domain: loads URL directly (adding https:// if missing).
-     * - Otherwise: treats as search query, URL-encodes it properly, and loads search engine.
-     */
     fun processInput(rawInput: String): String {
         val text = rawInput.trim()
         if (text.isEmpty()) return HOME_URL
 
-        // Check if starts with http:// or https://
         if (text.startsWith("http://", ignoreCase = true) || text.startsWith("https://", ignoreCase = true)) {
             return text
         }
 
-        // Check if looks like a valid domain (e.g. example.com, youtube.com, bbc.co.uk)
         val domainPattern = Regex("^[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+(/.*)?$")
         if (domainPattern.matches(text) && !text.contains(" ")) {
             return "https://$text"
         }
 
-        // Search query using configured engine (Default: Bing)
         val encoded = Uri.encode(text)
         return when (preferencesManager.searchEngine.lowercase()) {
             "google" -> "https://www.google.com/search?q=$encoded"
@@ -694,6 +757,14 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 TvDialogs.showSettingsDialog(this, preferencesManager) {
                     applyUserPreferences()
                 }
+            },
+            onExtensionsClick = {
+                TvDialogs.showExtensionsManagerDialog(
+                    context = this,
+                    extensionManager = extensionManager,
+                    onOpenWebStore = { loadUrl(STORE_URL) },
+                    onRefresh = { /* refreshed */ }
+                )
             }
         )
     }
@@ -743,7 +814,12 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     override fun onOpenExtensionManager() {
-        Toast.makeText(this, "Core Browser Mode Active", Toast.LENGTH_SHORT).show()
+        TvDialogs.showExtensionsManagerDialog(
+            context = this,
+            extensionManager = extensionManager,
+            onOpenWebStore = { loadUrl(STORE_URL) },
+            onRefresh = { /* refreshed */ }
+        )
     }
 
     override fun onToggleAdBlocker() {

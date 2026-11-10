@@ -10,32 +10,32 @@
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="56dp"
         android:layout_marginBottom="0dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:visibility="gone" />
 
-    <!-- Top Chromium Omnibox Bar (Edge / Chromium Style for TV and Web Browsing) -->
+    <!-- Top Apple-style Liquid Glass Omnibox Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
+        android:layout_height="56dp"
         android:layout_gravity="top"
-        android:background="#F2EAF4"
-        android:elevation="4dp"
+        android:background="@drawable/bg_liquid_glass_bar"
+        android:elevation="6dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
-        <!-- Navigation Buttons -->
+        <!-- Navigation Buttons with Liquid Glass Styling -->
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_icon_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/bg_liquid_glass_button"
             android:contentDescription="Back"
             android:focusable="true"
             android:scaleType="centerInside"
@@ -43,10 +43,10 @@
 
         <ImageButton
             android:id="@+id/btnForward"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_icon_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/bg_liquid_glass_button"
             android:contentDescription="Forward"
             android:focusable="true"
             android:scaleType="centerInside"
@@ -54,10 +54,10 @@
 
         <ImageButton
             android:id="@+id/btnReload"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/bg_icon_button"
+            android:background="@drawable/bg_liquid_glass_button"
             android:contentDescription="Reload"
             android:focusable="true"
             android:scaleType="centerInside"
@@ -65,26 +65,26 @@
 
         <ImageButton
             android:id="@+id/btnHome"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_icon_button"
+            android:background="@drawable/bg_liquid_glass_button"
             android:contentDescription="Home"
             android:focusable="true"
             android:scaleType="centerInside"
             android:src="@drawable/ic_home" />
 
-        <!-- Stadium Omnibox / Address Bar -->
+        <!-- Stadium Omnibox / Address Bar (Frosted Liquid Glass Pill) -->
         <LinearLayout
             android:id="@+id/omniboxContainer"
             android:layout_width="0dp"
-            android:layout_height="38dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_search_pill"
+            android:background="@drawable/bg_liquid_glass_pill"
             android:gravity="center_vertical"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp">
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
 
             <ImageView
                 android:layout_width="16dp"
@@ -98,15 +98,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@null"
+                android:fontFamily="sans-serif-medium"
                 android:hint="Enter search or web address"
                 android:imeOptions="actionGo"
                 android:inputType="textUri"
+                android:letterSpacing="-0.01"
                 android:singleLine="true"
-                android:textColor="#0F172A"
-                android:textColorHint="#64748B"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#94A3B8"
                 android:textCursorDrawable="@null"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="13sp" />
         </LinearLayout>
 
         <!-- Adblock Shield Button -->
@@ -115,7 +116,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/bg_icon_button"
+            android:background="@drawable/bg_liquid_glass_button"
             android:clickable="true"
             android:focusable="true">
 
@@ -132,7 +133,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:background="#EA4335"
+                android:background="#EF4444"
+                android:fontFamily="sans-serif"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:text="0"
@@ -145,9 +147,9 @@
         <!-- 3-Dots Menu Button -->
         <ImageButton
             android:id="@+id/btnMenu"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_icon_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_liquid_glass_button"
             android:contentDescription="Menu"
             android:focusable="true"
             android:scaleType="centerInside"
@@ -161,8 +163,8 @@
         android:layout_width="match_parent"
         android:layout_height="2.5dp"
         android:layout_gravity="top"
-        android:layout_marginTop="54dp"
-        android:elevation="6dp"
+        android:layout_marginTop="56dp"
+        android:elevation="8dp"
         android:indeterminate="false"
         android:max="100"
         android:progressDrawable="@android:drawable/progress_horizontal"
@@ -181,7 +183,7 @@
             android:id="@+id/edgeArcTvContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="54dp"
+            android:layout_marginTop="56dp"
             android:visibility="gone">
 
             <!-- Center Glowing Logo / Liquid Orb Aesthetic -->
@@ -204,14 +206,14 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp">
 
-                <!-- Center Prominent Search Stadium Pill -->
+                <!-- Center Prominent Search Stadium Pill (Liquid Glass) -->
                 <LinearLayout
                     android:id="@+id/centerSearchContainer"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:maxWidth="520dp"
-                    android:background="@drawable/bg_center_search"
-                    android:elevation="4dp"
+                    android:background="@drawable/bg_liquid_glass_pill"
+                    android:elevation="6dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
@@ -230,18 +232,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@null"
+                        android:fontFamily="sans-serif-medium"
                         android:hint="Search the web"
                         android:imeOptions="actionSearch"
                         android:inputType="textUri"
+                        android:letterSpacing="-0.01"
                         android:singleLine="true"
-                        android:textColor="#0F172A"
-                        android:textColorHint="#64748B"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#94A3B8"
                         android:textCursorDrawable="@null"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
-                <!-- Quick Speed Dial Circular Icons -->
+                <!-- Quick Speed Dial Circular Icons (Glossy Liquid Glass Buttons) -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -252,12 +255,12 @@
                     <!-- Bing Shortcut -->
                     <ImageButton
                         android:id="@+id/btnShortcutBing"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:layout_margin="8dp"
-                        android:background="@drawable/bg_circle_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="Bing"
-                        android:elevation="3dp"
+                        android:elevation="4dp"
                         android:focusable="true"
                         android:scaleType="centerInside"
                         android:src="@drawable/helium_logo" />
@@ -265,12 +268,12 @@
                     <!-- Google Shortcut -->
                     <ImageButton
                         android:id="@+id/btnShortcutGoogle"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:layout_margin="8dp"
-                        android:background="@drawable/bg_circle_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="Google"
-                        android:elevation="3dp"
+                        android:elevation="4dp"
                         android:focusable="true"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_google_g" />
@@ -278,12 +281,12 @@
                     <!-- YouTube Shortcut -->
                     <ImageButton
                         android:id="@+id/btnShortcutYoutube"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:layout_margin="8dp"
-                        android:background="@drawable/bg_circle_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="YouTube"
-                        android:elevation="3dp"
+                        android:elevation="4dp"
                         android:focusable="true"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_youtube" />
@@ -291,12 +294,12 @@
                     <!-- Gemini AI Shortcut -->
                     <ImageButton
                         android:id="@+id/btnShortcutGemini"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
                         android:layout_margin="8dp"
-                        android:background="@drawable/bg_circle_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="Gemini AI"
-                        android:elevation="3dp"
+                        android:elevation="4dp"
                         android:focusable="true"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_gemini_sparkle" />
@@ -310,8 +313,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.01"
                 android:text="You can't stop the waves, but you can learn to surf"
-                android:textColor="#594E6A"
+                android:textColor="#E2E8F0"
                 android:textSize="13sp"
                 android:textStyle="italic|bold" />
         </FrameLayout>
@@ -356,6 +361,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="-0.02"
                         android:text="Helium"
                         android:textColor="#FFFFFF"
                         android:textSize="20sp"
@@ -364,9 +371,9 @@
                     <!-- Aloha Gift Icon -->
                     <ImageButton
                         android:id="@+id/btnAlohaGift"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_button"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="Gift Rewards"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_gift" />
@@ -374,10 +381,10 @@
                     <!-- Aloha QR Scanner Icon -->
                     <ImageButton
                         android:id="@+id/btnAlohaQr"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_icon_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="QR Code"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_qr_code" />
@@ -385,23 +392,23 @@
                     <!-- Aloha Settings Gear Icon -->
                     <ImageButton
                         android:id="@+id/btnAlohaSettings"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_icon_button"
+                        android:background="@drawable/bg_liquid_glass_button"
                         android:contentDescription="Settings"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_settings" />
                 </LinearLayout>
 
-                <!-- Aloha Dark Capsule Search Bar -->
+                <!-- Aloha Liquid Glass Capsule Search Bar -->
                 <LinearLayout
                     android:id="@+id/alohaSearchContainer"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="14dp"
-                    android:background="@drawable/bg_aloha_search"
-                    android:elevation="4dp"
+                    android:background="@drawable/bg_liquid_glass_pill"
+                    android:elevation="6dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="10dp"
@@ -427,6 +434,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom|end"
                             android:background="#EF4444"
+                            android:fontFamily="sans-serif"
                             android:paddingStart="3dp"
                             android:paddingEnd="3dp"
                             android:text="0"
@@ -452,15 +460,16 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="@null"
+                        android:fontFamily="sans-serif-medium"
                         android:hint="Search in Google or Bing"
                         android:imeOptions="actionSearch"
                         android:inputType="textUri"
+                        android:letterSpacing="-0.01"
                         android:singleLine="true"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#94A3B8"
                         android:textCursorDrawable="@null"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textSize="13sp" />
 
                     <!-- Aloha AI Sparkle Pill Button -->
                     <LinearLayout
@@ -479,6 +488,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
                             android:text="✨ AI"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
@@ -504,7 +514,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Shortcuts Grid Row 1 -->
+                    <!-- Shortcuts Grid Row 1 (Liquid Glass Tiles) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -520,6 +530,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -533,8 +544,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="Google"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -547,6 +560,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -554,6 +568,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
                                 android:text="𝕏"
                                 android:textColor="#FFFFFF"
                                 android:textSize="22sp"
@@ -563,8 +578,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="X"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -577,6 +594,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -584,6 +602,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
                                 android:text="ebay"
                                 android:textColor="#38BDF8"
                                 android:textSize="18sp"
@@ -593,8 +612,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="eBay"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -607,6 +628,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -614,6 +636,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
                                 android:text="B."
                                 android:textColor="#60A5FA"
                                 android:textSize="20sp"
@@ -623,8 +646,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="3dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="Booking"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -646,6 +671,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -659,8 +685,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="SkyScan"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -673,6 +701,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -686,8 +715,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="Weather"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
@@ -700,6 +731,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -713,12 +745,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="YouTube"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
 
-                        <!-- Add / Settings Tile -->
+                        <!-- Add Tile -->
                         <LinearLayout
                             android:id="@+id/tileAdd"
                             android:layout_width="0dp"
@@ -727,6 +761,7 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_square_tile"
                             android:clickable="true"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical">
@@ -740,8 +775,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.01"
                                 android:text="Add"
-                                android:textColor="#E2E8F0"
+                                android:textColor="#F1F5F9"
                                 android:textSize="11sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -757,6 +794,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="-0.01"
                             android:text="News powered by Microsoft Start"
                             android:textColor="#94A3B8"
                             android:textSize="12sp"
@@ -781,7 +820,9 @@
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/bg_pill_category"
                                     android:clickable="true"
+                                    android:elevation="2dp"
                                     android:focusable="true"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
                                     android:paddingStart="12dp"
                                     android:paddingEnd="12dp"
@@ -797,7 +838,9 @@
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/bg_pill_category"
                                     android:clickable="true"
+                                    android:elevation="2dp"
                                     android:focusable="true"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
                                     android:paddingStart="12dp"
                                     android:paddingEnd="12dp"
@@ -812,7 +855,9 @@
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/bg_pill_category"
                                     android:clickable="true"
+                                    android:elevation="2dp"
                                     android:focusable="true"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
                                     android:paddingStart="12dp"
                                     android:paddingEnd="12dp"
@@ -827,7 +872,9 @@
                                     android:layout_marginEnd="6dp"
                                     android:background="@drawable/bg_pill_category"
                                     android:clickable="true"
+                                    android:elevation="2dp"
                                     android:focusable="true"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
                                     android:paddingStart="12dp"
                                     android:paddingEnd="12dp"
@@ -841,7 +888,9 @@
                                     android:layout_height="32dp"
                                     android:background="@drawable/bg_pill_category"
                                     android:clickable="true"
+                                    android:elevation="2dp"
                                     android:focusable="true"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
                                     android:paddingStart="12dp"
                                     android:paddingEnd="12dp"
@@ -851,15 +900,15 @@
                             </LinearLayout>
                         </HorizontalScrollView>
 
-                        <!-- Featured News Card -->
+                        <!-- Featured News Card (Liquid Glass Surface) -->
                         <LinearLayout
                             android:id="@+id/cardFeaturedNews"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_news_card"
+                            android:background="@drawable/bg_liquid_glass_card"
                             android:clickable="true"
-                            android:elevation="3dp"
+                            android:elevation="4dp"
                             android:focusable="true"
                             android:orientation="vertical"
                             android:padding="16dp">
@@ -867,6 +916,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
                                 android:text="Microsoft Start • Top Stories"
                                 android:textColor="#38BDF8"
                                 android:textSize="11sp"
@@ -876,8 +926,10 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="-0.015"
                                 android:text="Trending Headlines, Live Sports Updates and Daily Insights"
-                                android:textColor="#F1F5F9"
+                                android:textColor="#F8FAFC"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
@@ -885,6 +937,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="sans-serif"
                                 android:text="Tap to browse the latest breaking stories, cricket scores, and personalized updates curated for you."
                                 android:textColor="#94A3B8"
                                 android:textSize="12sp" />
@@ -897,14 +950,14 @@
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Mobile Bottom Navigation Bar (Aloha Style for Phones) -->
+    <!-- Mobile Bottom Navigation Bar (Apple Liquid Glass Style) -->
     <LinearLayout
         android:id="@+id/mobileNavBar"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="54dp"
         android:layout_gravity="bottom"
-        android:background="#101726"
-        android:elevation="10dp"
+        android:background="@drawable/bg_liquid_glass_bar"
+        android:elevation="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="gone">
@@ -970,13 +1023,13 @@
             android:src="@drawable/ic_settings" />
     </LinearLayout>
 
-    <!-- Clean Error & Retry Screen (No More Crashes!) -->
+    <!-- Clean Error & Retry Screen (Liquid Glass Card) -->
     <LinearLayout
         android:id="@+id/errorContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="54dp"
-        android:background="#F2EAF4"
+        android:layout_marginTop="56dp"
+        android:background="#A610141D"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="32dp"
@@ -986,8 +1039,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxWidth="460dp"
-            android:background="@drawable/bg_glass_card"
-            android:elevation="6dp"
+            android:background="@drawable/bg_liquid_glass_card"
+            android:elevation="8dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="28dp">
@@ -1002,8 +1055,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.02"
                 android:text="Webpage Failed to Load"
-                android:textColor="#0F172A"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -1012,9 +1067,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif"
                 android:gravity="center"
                 android:text="Check your internet connection and try again."
-                android:textColor="#64748B"
+                android:textColor="#94A3B8"
                 android:textSize="13sp" />
 
             <LinearLayout
@@ -1026,40 +1082,42 @@
                 <Button
                     android:id="@+id/btnRetry"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="42dp"
                     android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_quick_shortcut"
+                    android:background="@drawable/bg_liquid_glass_button"
                     android:focusable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="🔄 Retry"
-                    android:textColor="#2563EB"
+                    android:textColor="#38BDF8"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnErrorHome"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_quick_shortcut"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_liquid_glass_button"
                     android:focusable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="🏠 Bing Home"
-                    android:textColor="#0F172A"
+                    android:textColor="#F8FAFC"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Slide-in Gemini AI Assistant Panel -->
+    <!-- Slide-in Gemini AI Assistant Panel (Liquid Glass Card) -->
     <LinearLayout
         android:id="@+id/geminiPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:maxWidth="440dp"
-        android:background="#FFFFFF"
-        android:elevation="16dp"
+        android:background="#E610141D"
+        android:elevation="18dp"
         android:orientation="vertical"
         android:padding="20dp"
         android:visibility="gone">
@@ -1080,8 +1138,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.02"
                 android:text="Gemini AI Assistant"
-                android:textColor="#0F172A"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -1089,26 +1149,29 @@
                 android:id="@+id/btnCloseGemini"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_quick_shortcut"
+                android:background="@drawable/bg_liquid_glass_button"
+                android:fontFamily="sans-serif-medium"
                 android:text="✕ Close"
-                android:textColor="#0F172A"
+                android:textColor="#F8FAFC"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <EditText
             android:id="@+id/etGeminiPrompt"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="46dp"
             android:layout_marginTop="16dp"
-            android:background="@drawable/bg_search_pill"
+            android:background="@drawable/bg_liquid_glass_pill"
+            android:fontFamily="sans-serif-medium"
             android:hint="Ask Gemini anything or summarize page..."
             android:imeOptions="actionSend"
             android:inputType="text"
+            android:letterSpacing="-0.01"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:singleLine="true"
-            android:textColor="#0F172A"
-            android:textColorHint="#64748B"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#94A3B8"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -1120,23 +1183,25 @@
             <Button
                 android:id="@+id/btnQuickSummarize"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_quick_shortcut"
+                android:background="@drawable/bg_liquid_glass_button"
+                android:fontFamily="sans-serif-medium"
                 android:text="📄 Summarize"
-                android:textColor="#2563EB"
+                android:textColor="#38BDF8"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnQuickHindi"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_quick_shortcut"
+                android:background="@drawable/bg_liquid_glass_button"
+                android:fontFamily="sans-serif-medium"
                 android:text="🌐 Hindi Me"
-                android:textColor="#7C3AED"
+                android:textColor="#C084FC"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -1151,9 +1216,10 @@
                 android:id="@+id/tvGeminiResponse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:lineSpacingExtra="4dp"
                 android:text="✨ Gemini AI ready! Ask any question or click Summarize above."
-                android:textColor="#1E293B"
+                android:textColor="#E2E8F0"
                 android:textSize="14sp" />
         </ScrollView>
     </LinearLayout>
