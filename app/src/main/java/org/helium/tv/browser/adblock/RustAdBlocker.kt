@@ -1,17 +1,17 @@
 package org.helium.tv.browser.adblock
 
-import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 /**
  * High-performance JNI bridge to the Rust Adblock & Content Filtering Core.
+ * Robust crash-safe wrapper for both Phone and Android TV.
  */
 object RustAdBlocker {
     private const val TAG = "RustAdBlocker"
     private var isNativeLoaded = false
+    private var fallbackBlockedCount = 0
 
     init {
         try {
@@ -19,51 +19,78 @@ object RustAdBlocker {
             nativeInit()
             isNativeLoaded = true
             Log.i(TAG, "Rust helium_adblock native library successfully loaded")
-        } catch (e: UnsatisfiedLinkError) {
-            Log.w(TAG, "Native library 'helium_adblock' not found yet. Using fallback filter.", e)
+        } catch (t: Throwable) {
+            Log.w(TAG, "Native library 'helium_adblock' not available. Using fallback filter.", t)
             isNativeLoaded = false
         }
     }
 
     suspend fun shouldBlock(url: String, origin: String = "", resourceType: String = "other"): Boolean {
         if (!isNativeLoaded) {
-            // Fallback lightweight blocking check
-            return fallbackShouldBlock(url)
+            val blocked = fallbackShouldBlock(url)
+            if (blocked) fallbackBlockedCount++
+            return blocked
         }
-        return withContext(Dispatchers.Default) {
-            nativeShouldBlock(url, origin, resourceType)
+        return try {
+            withContext(Dispatchers.Default) {
+                nativeShouldBlock(url, origin, resourceType)
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "Error in nativeShouldBlock, falling back", t)
+            fallbackShouldBlock(url)
         }
     }
 
     suspend fun addRule(rule: String): Boolean {
         if (!isNativeLoaded) return false
-        return withContext(Dispatchers.Default) {
-            nativeAddRule(rule)
+        return try {
+            withContext(Dispatchers.Default) {
+                nativeAddRule(rule)
+            }
+        } catch (t: Throwable) {
+            false
         }
     }
 
     suspend fun loadFilterRules(rulesContent: String): Int {
         if (!isNativeLoaded) return 0
-        return withContext(Dispatchers.IO) {
-            nativeLoadFilterRules(rulesContent)
+        return try {
+            withContext(Dispatchers.IO) {
+                nativeLoadFilterRules(rulesContent)
+            }
+        } catch (t: Throwable) {
+            0
         }
     }
 
     suspend fun getCosmeticScriptForDomain(domain: String): String {
         if (!isNativeLoaded) return ""
-        return withContext(Dispatchers.Default) {
-            nativeGetCosmeticScript(domain)
+        return try {
+            withContext(Dispatchers.Default) {
+                nativeGetCosmeticScript(domain)
+            }
+        } catch (t: Throwable) {
+            ""
         }
     }
 
     fun getBlockedCount(): Int {
-        if (!isNativeLoaded) return 0
-        return nativeGetBlockedCount()
+        if (!isNativeLoaded) return fallbackBlockedCount
+        return try {
+            nativeGetBlockedCount()
+        } catch (t: Throwable) {
+            fallbackBlockedCount
+        }
     }
 
     fun resetBlockedCount() {
+        fallbackBlockedCount = 0
         if (isNativeLoaded) {
-            nativeResetBlockedCount()
+            try {
+                nativeResetBlockedCount()
+            } catch (t: Throwable) {
+                Log.w(TAG, "Error in nativeResetBlockedCount", t)
+            }
         }
     }
 

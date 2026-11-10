@@ -1,5 +1,8 @@
 # Proguard Rules for Helium TV Browser
 
+# Disable obfuscation to guarantee 100% stability for GeckoView JNI and Rust JNI bindings
+-dontobfuscate
+
 # Keep GeckoView internal and external bindings
 -keep class org.mozilla.geckoview.** { *; }
 -keep interface org.mozilla.geckoview.** { *; }

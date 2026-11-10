@@ -26,9 +26,9 @@ class VirtualMouseOverlay @JvmOverloads constructor(
 
     private var cursorX = 960f
     private var cursorY = 540f
-    private var isCursorVisible = true
+    private var isCursorVisible = false
     private var isPressed = false
-    private var isEnabled = true
+    private var isEnabled = false
 
     // Target View to receive synthetic events (GeckoView / WebView)
     var targetView: View? = null
