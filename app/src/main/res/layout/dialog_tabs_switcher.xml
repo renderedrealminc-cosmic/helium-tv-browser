@@ -74,7 +74,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_maxHeight="360dp"
         android:overScrollMode="ifContentScrolls">
 
         <LinearLayout
