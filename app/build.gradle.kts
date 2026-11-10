@@ -95,8 +95,8 @@ android {
 }
 
 dependencies {
-    // Mozilla GeckoView - Verified Working Release from Mozilla Maven
-    implementation("org.mozilla.geckoview:geckoview-omni:99.0.20220411174855")
+    // Modern Chromium WebView Support
+    implementation("androidx.webkit:webkit:1.10.0")
 
     // Android TV & UI support
     implementation("androidx.appcompat:appcompat:1.6.1")

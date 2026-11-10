@@ -2,17 +2,8 @@ package org.helium.tv.browser.ui
 
 import android.content.Context
 import android.util.Log
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.helium.tv.browser.engine.ExtensionItem
-import org.helium.tv.browser.engine.ExtensionManager
 import org.helium.tv.browser.search.OpenSearchManager
 import org.helium.tv.browser.search.SearchEngine
 
@@ -22,7 +13,6 @@ object TvDialogs {
     fun showMenuDialog(
         context: Context,
         onGeminiClick: () -> Unit,
-        onExtensionsClick: () -> Unit,
         onPointerToggle: () -> Unit,
         onUserAgentClick: () -> Unit,
         onSearchEngineClick: () -> Unit,
@@ -33,7 +23,6 @@ object TvDialogs {
         try {
             val options = arrayOf(
                 "✨ Gemini AI Assistant",
-                "🧩 Extensions & Add-ons (.xpi)",
                 "🎯 Toggle Mouse Pointer",
                 "🖥️ Switch User-Agent (TV / Desktop / Mobile)",
                 "🔍 Search Engine (Bing / Google)",
@@ -48,13 +37,12 @@ object TvDialogs {
                     try {
                         when (which) {
                             0 -> onGeminiClick()
-                            1 -> onExtensionsClick()
-                            2 -> onPointerToggle()
-                            3 -> onUserAgentClick()
-                            4 -> onSearchEngineClick()
-                            5 -> onPipClick()
-                            6 -> onReloadClick()
-                            7 -> onClearDataClick()
+                            1 -> onPointerToggle()
+                            2 -> onUserAgentClick()
+                            3 -> onSearchEngineClick()
+                            4 -> onPipClick()
+                            5 -> onReloadClick()
+                            6 -> onClearDataClick()
                         }
                     } catch (t: Throwable) {
                         Log.e(TAG, "Error in menu action", t)
@@ -117,114 +105,6 @@ object TvDialogs {
                 .show()
         } catch (t: Throwable) {
             Log.e(TAG, "Failed showing tabs dialog", t)
-        }
-    }
-
-    fun showExtensionManagerDialog(
-        context: Context,
-        extensionManager: ExtensionManager,
-        scope: CoroutineScope
-    ) {
-        try {
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle("🧩 Extension Manager")
-
-            val container = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(32, 24, 32, 24)
-            }
-
-            val tvStatus = TextView(context).apply {
-                text = "Loading installed extensions..."
-                textSize = 15f
-            }
-            container.addView(tvStatus)
-
-            val installedListContainer = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-            }
-            container.addView(installedListContainer)
-
-            val recommendedHeader = TextView(context).apply {
-                text = "\n🌟 Recommended Extensions:"
-                textSize = 16f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-            }
-            container.addView(recommendedHeader)
-
-            for (rec in ExtensionManager.RECOMMENDED_EXTENSIONS) {
-                val btnInstall = Button(context).apply {
-                    text = "Install: ${rec.first} (${rec.second})"
-                    isFocusable = true
-                    setOnClickListener {
-                        isEnabled = false
-                        text = "Downloading ${rec.first}..."
-                        scope.launch {
-                            val success = extensionManager.downloadAndInstallXpi(rec.third)
-                            withContext(Dispatchers.Main) {
-                                if (success) {
-                                    Toast.makeText(context, "✅ Installed ${rec.first} successfully!", Toast.LENGTH_SHORT).show()
-                                    text = "Installed: ${rec.first}"
-                                } else {
-                                    Toast.makeText(context, "❌ Failed installing ${rec.first}", Toast.LENGTH_SHORT).show()
-                                    isEnabled = true
-                                    text = "Install: ${rec.first}"
-                                }
-                            }
-                        }
-                    }
-                }
-                container.addView(btnInstall)
-            }
-
-            builder.setView(container)
-            builder.setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
-            val dialog = builder.create()
-            dialog.show()
-
-            // Fetch installed extensions asynchronously
-            scope.launch {
-                val list = extensionManager.refreshInstalledExtensions()
-                withContext(Dispatchers.Main) {
-                    installedListContainer.removeAllViews()
-                    if (list.isEmpty()) {
-                        tvStatus.text = "No extensions installed yet."
-                    } else {
-                        tvStatus.text = "Installed Extensions (${list.size}):"
-                        for (ext in list) {
-                            val row = LinearLayout(context).apply {
-                                orientation = LinearLayout.HORIZONTAL
-                                setPadding(0, 8, 0, 8)
-                            }
-                            val title = TextView(context).apply {
-                                text = "• ${ext.name} (v${ext.version})"
-                                textSize = 14f
-                                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                            }
-                            val btnRemove = Button(context).apply {
-                                text = "Uninstall"
-                                isFocusable = true
-                                setOnClickListener {
-                                    ext.rawExtension?.let { raw ->
-                                        scope.launch {
-                                            extensionManager.uninstallExtension(raw)
-                                            withContext(Dispatchers.Main) {
-                                                installedListContainer.removeView(row)
-                                                Toast.makeText(context, "Uninstalled ${ext.name}", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            row.addView(title)
-                            row.addView(btnRemove)
-                            installedListContainer.addView(row)
-                        }
-                    }
-                }
-            }
-        } catch (t: Throwable) {
-            Log.e(TAG, "Failed showing extension manager dialog", t)
         }
     }
 }
