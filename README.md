@@ -1,101 +1,73 @@
-# 🎈 Helium TV Browser (Rust + Kotlin)
+# 💎 Renderium TV & Mobile Browser
 
-Ek tagada aur powerful **Android TV Web Browser** jo **Kotlin + Rust + Mozilla GeckoView** par tayyar kiya gaya hai. Isme full **WebExtensions support (.xpi / Firefox Addons)**, high-performance **Rust Native Adblocker**, **Hybrid Virtual Mouse Pointer**, aur Helium browser ke signature **Floating Picture-in-Picture & Translucency** features shamil hain.
+Ek ultra-lightweight, lightning-fast aur world-class secure **Android TV & Mobile Web Browser** jo **Kotlin + Native Chromium + Rust Core** par tayyar kiya gaya hai. Isme full **Chrome Web Store Extensions support**, **Multi-Tab Browsing Engine**, **Apple Liquid Glass Frosted Glassmorphism UI**, high-performance **Rust Native Adblocker**, **Chrome-Style Glass Menu**, aur **World-Class Security Suite** shamil hain.
 
 ---
 
 ## 🚀 Key Features
 
-1. **🧩 Full WebExtensions Support (GeckoView)**
-   - Mozilla GeckoView web engine ke zariye real desktop/mobile browser extensions support.
-   - 1-Click Install for TV-optimized extensions:
-     - **uBlock Origin**: Ultimate ad and tracker blocker.
-     - **SponsorBlock**: YouTube videos me sponsorships, intros aur outros skip karta hai.
-     - **Dark Reader**: Big TV screens par eye strain kam karne ke liye dark mode.
-     - **Violentmonkey / Tampermonkey**: Userscript support.
-   - Kisi bhi `.xpi` file ya direct Firefox Add-on store URL se extensions install karne ki sahulat.
+1. **📑 Multi-Tab Browsing Engine**
+   - Independent tabs system: Open multiple tabs, switch smoothly, close tabs, or open Private Incognito tabs.
+   - Interactive Tabs Switcher dialog with live tab preview, active badge, and 1-tap close.
+   - Real-time tab counter badge in top bar and mobile navigation bar.
 
-2. **🦀 Rust Native Adblock & Anti-Tracker Core (`helium-adblock`)**
-   - Pure Rust me likha gaya ultra-fast rule matching engine (`app/src/main/rust`).
-   - EasyList, uBlock filters, aur AdGuard syntax compatible.
-   - Cosmetic element hiding (blank spaces aur ad containers ko CSS ke zariye hide karta hai).
-   - JNI bindings ke zariye real-time request classification aur blocking stats.
+2. **✨ Modern Apple Liquid Glass UI & Chrome Menu**
+   - Frosted sapphire glass surfaces (`#A6141620`), thin reflective specular borders (`#33FFFFFF`), and electric cyan focus glow (`#00E5FF`).
+   - 150ms spring/ease-out animations for fluid touch and TV D-Pad navigation without frame drops.
+   - Sleek Chrome-style popup menu with quick navigation buttons, Desktop site toggle with clear ON/OFF status, and 1-tap search switcher.
 
-3. **🖱️ Hybrid TV Remote & Virtual Mouse Pointer**
-   - **Smooth Acceleration Physics**: TV Remote ke D-Pad (Up, Down, Left, Right) se pixel-precise arrow cursor move hota hai.
-   - **Click & Drag**: `DPAD_CENTER` (OK button) press karne par touch/click events dispatch hote hain.
-   - **Fast Scrolling**: TV remote ke `CHANNEL UP / DOWN` buttons se web pages smooth scroll hote hain.
-   - **Dual Mode**: Remote ke Green button se Virtual Mouse aur Native D-Pad Focus mode ke darmiyan instant switch.
+3. **🔍 Dynamic Search Engine Switcher & Home Screen**
+   - Instant switching between **Bing**, **Google**, and **DuckDuckGo**.
+   - Dynamic Home screen logo & hint matching: Displays Google logo & hints when Google is active, and Microsoft Bing logo & hints when Bing is active.
+   - Smart URL & search processing: automatic HTTPS upgrade, domain resolution, and query encoding.
 
-4. **🪟 Helium Signature Features (Floating PiP & Opacity)**
-   - **System Picture-in-Picture**: Video chalte waqt TV remote ke Blue button se instant PiP mode.
-   - **Translucency / Window Opacity**: Browser ki transparency (100%, 80%, 60%, 40%) adjust karke peeche chalne wali TV screen ya video ko dekhna.
+4. **🛡️ World-Class Security Suite ("World ka sabse secure browser")**
+   - **Google SafeBrowsing API**: Automated interception of phishing, malware, and harmful sites.
+   - **Third-Party Cookie Isolation**: Strictly blocks cross-site tracking cookies.
+   - **Local Filesystem Sandbox Lockdown**: File scheme access (`file:///`) disabled to prevent local data exfiltration.
+   - **HTTPS Everywhere**: Upgrades insecure HTTP requests to encrypted HTTPS.
+   - **Anti-Clickjacking Shield**: Blocks malicious unauthorized pop-up windows.
 
-5. **📺 TV Speed Dial & User-Agent Switcher**
-   - 10-foot Leanback UI: YouTube TV, Twitch, Reddit, Wikipedia, aur custom bookmarks ke cards.
-   - **User-Agent Profiles**: TV (Leanback), Desktop (1080p/4K Windows Chrome layout), aur Mobile modes ke darmiyan 1-tap switch.
+5. **🧩 Chrome Web Store Extensions Support**
+   - Auto-detects Chrome Web Store extension pages and `.crx` downloads.
+   - In-page Liquid Glass "Add to Renderium" prompt and English installation confirmation dialog.
+   - Sandboxed extraction into app private storage with automatic content script injection.
 
----
+6. **🦀 Rust Native Adblock Core (`renderium-adblock`)**
+   - Pure Rust ultra-fast rule matching engine (`app/src/main/rust`).
+   - EasyList, uBlock filters, and AdGuard syntax compatible.
+   - Cosmetic element hiding and real-time blocked counter.
 
-## 🎮 TV Remote Controls & Shortcuts
-
-| TV Remote Button | Functionality |
-| :--- | :--- |
-| **D-Pad (Arrows)** | Virtual Mouse Pointer ko smoothly move karta hai (acceleration ke sath) |
-| **D-Pad Center (OK)** | Web elements, links, aur video controls par click karta hai |
-| **🔴 RED Button** | Extension Manager modal open karta hai (Add-on toggle / install) |
-| **🟢 GREEN Button** | Virtual Mouse Pointer ON / OFF (Focus Mode) toggle karta hai |
-| **🟡 YELLOW Button** | Rust Adblock stats (Blocked ads counter) display karta hai |
-| **🔵 BLUE Button** | Floating Picture-in-Picture (PiP) mode trigger karta hai |
-| **📺 MENU Button** | TV Quick Bar (Address bar, UA switcher, Opacity slider) show/hide |
-| **🔼 / 🔽 CH+/-** | Web page ko fast up/down scroll karta hai |
-| **🔙 BACK Button** | Web history me pichhe jata hai ya Menu close karta hai |
+7. **📱 Dual Layouts: Aloha Mobile + TV Edge Arc**
+   - **Mobile Mode**: Aloha-inspired layout with quick shortcut tiles, Microsoft Start news feed, and bottom navigation bar.
+   - **TV Mode**: 10-foot Leanback layout with Virtual Mouse Pointer (D-Pad physics acceleration) and centered search stadium pill.
 
 ---
 
 ## 📂 Project Architecture
 
 ```
-helium-tv-browser/
+renderium/
 ├── app/
-│   ├── build.gradle.kts           # GeckoView, Leanback, NDK dependencies
-│   ├── CMakeLists.txt             # Rust cdylib NDK compilation bridge
-│   └── src/main/
-│       ├── AndroidManifest.xml    # Leanback Launcher, PiP, hardware acceleration
-│       ├── rust/                  # 🦀 Pure Rust Adblock Engine
-│       │   ├── Cargo.toml         # Rust crate configuration
-│       │   └── src/
-│       │       ├── lib.rs         # JNI exports for Android Kotlin
-│       │       ├── matcher.rs     # EasyList/ABP wildcard matching engine
-│       │       └── cosmetic.rs    # CSS element-hiding generator
-│       ├── java/org/helium/tv/browser/
-│       │   ├── MainActivity.kt    # Main TV Coordinator
-│       │   ├── HeliumTvApplication.kt
-│       │   ├── adblock/           # JNI bridge & filter list updater
-│       │   ├── engine/            # GeckoView runtime & WebExtension controller
-│       │   ├── input/             # Virtual Mouse cursor & D-Pad event handler
-│       │   ├── pip/               # Picture-in-Picture & window translucency
-│       │   ├── ui/                # TV Speed Dial, Dialogs, Leanback adapters
-│       │   └── utils/             # TV/Desktop User-Agent profiles
-│       └── res/                   # TV layouts, styles, and Leanback banners
-├── build.gradle.kts
-├── settings.gradle.kts
-└── gradle.properties
+│   ├── src/main/java/org/helium/tv/browser/
+│   │   ├── MainActivity.kt               # Central coordinator & multi-tab navigation
+│   │   ├── tabs/TabManager.kt            # Independent tab lifecycle & state management
+│   │   ├── ui/TvDialogs.kt               # Chrome-style Liquid Glass dialogs & menus
+│   │   ├── ui/LiquidGlassUtils.kt        # 150ms spring physics & glass styling
+│   │   ├── security/RenderiumSecurityManager.kt # World-class security & sandbox enforcement
+│   │   ├── extensions/ExtensionManager.kt # Chrome Web Store CRX installer & injector
+│   │   ├── adblock/                      # Rust JNI adblock filter bridges
+│   │   ├── engine/                       # Hardened Chromium WebView & WebChrome clients
+│   │   └── settings/                     # Wallpapers, layout & search engine preferences
+│   ├── src/main/rust/                    # Native Rust adblock & rule matcher engine
+│   └── src/main/res/                     # Liquid glass drawables, vector icons & layouts
+└── .github/workflows/build.yml           # Automated multi-architecture APK builder
 ```
 
 ---
 
-## 🛠️ How to Build
+## 📦 APK Artifacts & Download
 
-### Option 1: Android Studio (PC / Laptop)
-1. Project folder ko Android Studio me open karein.
-2. NDK (version 25+) aur Rust toolchain (`cargo`, `rustup target add aarch64-linux-android`) install honi chahiye.
-3. **Build -> Build Bundle(s) / APK(s) -> Build APK(s)** run karein.
-4. Output APK `app/build/outputs/apk/release/app-release.apk` ko apne Android TV par Sideload (e.g. via Send Files to TV) karein.
-
-### Option 2: Termux / CLI Build
-Termux me compile karne ke liye zaroori tools (`openjdk-17`, `rust`, `clang`, Android SDK command-line tools) ki zaroorat hoti hai.
-Build command:
-```bash
-./gradlew assembleRelease
-```
+Automated builds produce ultra-compact APKs (< 4 MB raw, ~2.3 MB zipped):
+- **`HeliumTV-arm64-v8a.apk`**: 64-bit Android phones, tablets, and modern 4K Android TVs.
+- **`HeliumTV-armeabi-v7a.apk`**: 32-bit Android TVs and legacy devices.

@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_liquid_glass_dialog"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header: Logo, Title, Close Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="Renderium Logo"
+            android:scaleType="centerCrop"
+            android:src="@drawable/renderium_logo" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.01"
+                android:text="Renderium"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="Ultra-Secure &amp; Liquid Fast"
+                android:textColor="#38BDF8"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnMenuClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_liquid_glass_button"
+            android:contentDescription="Close"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_close" />
+    </LinearLayout>
+
+    <!-- Quick Action Bar (Chrome style) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_liquid_glass_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
+
+        <ImageButton
+            android:id="@+id/btnQuickBack"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_back" />
+
+        <ImageButton
+            android:id="@+id/btnQuickForward"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Forward"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_forward" />
+
+        <ImageButton
+            android:id="@+id/btnQuickReload"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Reload"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_refresh" />
+
+        <ImageButton
+            android:id="@+id/btnQuickHome"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Home"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_home" />
+
+        <ImageButton
+            android:id="@+id/btnQuickPip"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Picture in Picture"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_qr_code" />
+    </LinearLayout>
+
+    <!-- Scrollable Menu Items -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="ifContentScrolls">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- New Tab -->
+            <LinearLayout
+                android:id="@+id/rowNewTab"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="New Tab"
+                    android:src="@drawable/ic_add" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="New Tab"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="➕ Open"
+                    android:textColor="#38BDF8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- New Incognito Tab -->
+            <LinearLayout
+                android:id="@+id/rowIncognitoTab"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="New Incognito Tab"
+                    android:src="@drawable/ic_incognito" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="New Incognito Tab"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="🕶️ Private"
+                    android:textColor="#94A3B8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Tabs Overview -->
+            <LinearLayout
+                android:id="@+id/rowTabsOverview"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Tabs"
+                    android:src="@drawable/ic_tabs" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Tabs Switcher"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvMenuTabCountBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_liquid_glass_button"
+                    android:fontFamily="sans-serif-bold"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="1 tab"
+                    android:textColor="#00E5FF"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Desktop Site (Clear ON/OFF indicator) -->
+            <LinearLayout
+                android:id="@+id/rowDesktopSite"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Desktop Site"
+                    android:src="@drawable/ic_desktop" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Desktop Site"
+                        android:textColor="#F8FAFC"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvDesktopSub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="Request desktop version"
+                        android:textColor="#94A3B8"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvDesktopStatusBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_liquid_glass_button"
+                    android:fontFamily="sans-serif-bold"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="OFF"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Search Engine Changer -->
+            <LinearLayout
+                android:id="@+id/rowSearchEngine"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:id="@+id/ivMenuSearchEngineIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Search Engine"
+                    android:src="@drawable/ic_search" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Search Engine"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvMenuSearchEngineBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_liquid_glass_button"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="Bing"
+                    android:textColor="#38BDF8"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Chrome Web Store Extensions -->
+            <LinearLayout
+                android:id="@+id/rowExtensions"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Extensions"
+                    android:src="@drawable/ic_settings" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Extensions Manager"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="🧩 Web Store"
+                    android:textColor="#A855F7"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Gemini AI Assistant -->
+            <LinearLayout
+                android:id="@+id/rowGeminiAi"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Gemini AI"
+                    android:src="@drawable/ic_gemini_sparkle" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Gemini AI Assistant"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="✨ Smart AI"
+                    android:textColor="#C084FC"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Virtual Mouse Pointer (TV Mode) -->
+            <LinearLayout
+                android:id="@+id/rowMousePointer"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Pointer"
+                    android:src="@drawable/ic_qr_code" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Virtual Mouse Pointer"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="🎯 TV Mode"
+                    android:textColor="#94A3B8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Settings & Themes -->
+            <LinearLayout
+                android:id="@+id/rowSettings"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Settings"
+                    android:src="@drawable/ic_settings" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Settings &amp; Themes"
+                    android:textColor="#F8FAFC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="⚙️ Wallpapers"
+                    android:textColor="#94A3B8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Clear Private Data -->
+            <LinearLayout
+                android:id="@+id/rowClearData"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Clear Data"
+                    android:src="@drawable/ic_shield" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Clear Browsing Data"
+                    android:textColor="#F87171"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="🛡️ Purge"
+                    android:textColor="#EF4444"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

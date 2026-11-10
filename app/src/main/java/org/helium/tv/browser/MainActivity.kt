@@ -12,7 +12,9 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -33,23 +35,26 @@ import org.helium.tv.browser.pip.FloatingPipManager
 import org.helium.tv.browser.search.OpenSearchManager
 import org.helium.tv.browser.security.RenderiumSecurityManager
 import org.helium.tv.browser.settings.PreferencesManager
+import org.helium.tv.browser.tabs.RenderiumTab
+import org.helium.tv.browser.tabs.TabManager
 import org.helium.tv.browser.ui.LiquidGlassUtils
 import org.helium.tv.browser.ui.TvDialogs
 import org.helium.tv.browser.utils.UserAgentMode
 import org.helium.tv.browser.utils.UserAgentUtils
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(), TvActionListener {
 
     companion object {
         private const val TAG = "RenderiumMainActivity"
-        const val HOME_URL = "https://www.bing.com"
+        const val BING_URL = "https://www.bing.com"
         const val GOOGLE_URL = "https://www.google.com"
         const val YOUTUBE_URL = "https://www.youtube.com"
         const val STORE_URL = "https://chromewebstore.google.com"
     }
 
     private lateinit var rootLayout: View
-    private lateinit var webView: WebView
+    private lateinit var webContainer: FrameLayout
     private lateinit var virtualMouseOverlay: VirtualMouseOverlay
     private lateinit var tvKeyHandler: TvKeyHandler
     private lateinit var pipManager: FloatingPipManager
@@ -57,6 +62,11 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var openSearchManager: OpenSearchManager
     private lateinit var preferencesManager: PreferencesManager
     private lateinit var extensionManager: ExtensionManager
+
+    // Multi-Tab Manager
+    private val tabManager = TabManager()
+    private val currentWebView: WebView?
+        get() = tabManager.getActiveTab()?.webView
 
     // Top Apple-style Liquid Glass Omnibox Bar Views
     private lateinit var topBar: View
@@ -68,6 +78,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var etOmnibox: EditText
     private lateinit var btnShieldLayout: View
     private lateinit var tvShieldCount: TextView
+    private lateinit var btnTopTabsLayout: View
+    private lateinit var tvTopTabsCount: TextView
     private lateinit var btnMenu: ImageButton
     private lateinit var progressBar: ProgressBar
 
@@ -78,6 +90,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     // TV Layout Elements
     private lateinit var centerSearchContainer: View
+    private lateinit var ivCenterSearchLogo: ImageView
     private lateinit var etCenterSearch: EditText
     private lateinit var btnCenterVoiceSearch: ImageButton
     private lateinit var btnShortcutBing: ImageButton
@@ -120,7 +133,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var btnNavHome: ImageButton
     private lateinit var btnNavMenu: ImageButton
     private lateinit var btnNavDownloads: ImageButton
-    private lateinit var btnNavTabs: ImageButton
+    private lateinit var btnNavTabsLayout: View
+    private lateinit var tvNavTabsCount: TextView
     private lateinit var btnNavSettings: ImageButton
 
     // Error & Retry Screen Views
@@ -161,8 +175,10 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
         initViews()
         initGeminiPanel()
-        initWebView()
         initTvControls()
+
+        // Create default first tab
+        createTab("", isIncognito = false)
 
         filterManager = FilterListManager(this)
         lifecycleScope.launch {
@@ -178,7 +194,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     private fun initViews() {
         rootLayout = findViewById(R.id.rootLayout)
-        webView = findViewById(R.id.webView)
+        webContainer = findViewById(R.id.webContainer)
         virtualMouseOverlay = findViewById(R.id.virtualMouseOverlay)
         pipManager = FloatingPipManager(this)
 
@@ -192,6 +208,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         etOmnibox = findViewById(R.id.etOmnibox)
         btnShieldLayout = findViewById(R.id.btnShieldLayout)
         tvShieldCount = findViewById(R.id.tvShieldCount)
+        btnTopTabsLayout = findViewById(R.id.btnTopTabsLayout)
+        tvTopTabsCount = findViewById(R.id.tvTopTabsCount)
         btnMenu = findViewById(R.id.btnMenu)
         progressBar = findViewById(R.id.progressBar)
 
@@ -202,6 +220,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
         // TV Layout Views
         centerSearchContainer = findViewById(R.id.centerSearchContainer)
+        ivCenterSearchLogo = findViewById(R.id.ivCenterSearchLogo)
         etCenterSearch = findViewById(R.id.etCenterSearch)
         btnCenterVoiceSearch = findViewById(R.id.btnCenterVoiceSearch)
         btnShortcutBing = findViewById(R.id.btnShortcutBing)
@@ -244,7 +263,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnNavHome = findViewById(R.id.btnNavHome)
         btnNavMenu = findViewById(R.id.btnNavMenu)
         btnNavDownloads = findViewById(R.id.btnNavDownloads)
-        btnNavTabs = findViewById(R.id.btnNavTabs)
+        btnNavTabsLayout = findViewById(R.id.btnNavTabsLayout)
+        tvNavTabsCount = findViewById(R.id.tvNavTabsCount)
         btnNavSettings = findViewById(R.id.btnNavSettings)
 
         // Error Container
@@ -253,20 +273,18 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnRetry = findViewById(R.id.btnRetry)
         btnErrorHome = findViewById(R.id.btnErrorHome)
 
-        // Attach crisp 150ms spring/ease-out animations (no blur distortion)
         attachLiquidAnimations()
-
         setupListeners()
     }
 
     private fun attachLiquidAnimations() {
         val buttonsToAnimate = listOf(
-            btnBack, btnForward, btnReload, btnHome, btnShieldLayout, btnMenu,
+            btnBack, btnForward, btnReload, btnHome, btnShieldLayout, btnTopTabsLayout, btnMenu,
             btnShortcutBing, btnShortcutGoogle, btnShortcutYoutube, btnShortcutGemini, btnCenterVoiceSearch,
             btnAlohaGift, btnAlohaQr, btnAlohaSettings, btnAlohaShield, btnAlohaAi,
             tileGoogle, tileX, tileEbay, tileBooking, tileSkyscanner, tileWeather, tileYoutube, tileAdd,
             pillHot, pillNews, pillEntertainment, pillSports, pillMoney,
-            btnNavBack, btnNavHome, btnNavMenu, btnNavDownloads, btnNavTabs, btnNavSettings
+            btnNavBack, btnNavHome, btnNavMenu, btnNavDownloads, btnNavTabsLayout, btnNavSettings
         )
         buttonsToAnimate.forEach { LiquidGlassUtils.attachTouchFeedback(it) }
 
@@ -285,29 +303,35 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private fun setupListeners() {
         btnBack.setOnClickListener {
             safelyRun {
-                if (webView.visibility == View.VISIBLE && webView.canGoBack()) {
-                    webView.goBack()
-                } else {
-                    returnToHome()
-                }
+                currentWebView?.let { wv ->
+                    if (webContainer.visibility == View.VISIBLE && wv.canGoBack()) {
+                        wv.goBack()
+                    } else {
+                        returnToHome()
+                    }
+                } ?: returnToHome()
             }
         }
 
         btnForward.setOnClickListener {
             safelyRun {
-                if (webView.visibility == View.VISIBLE && webView.canGoForward()) {
-                    webView.goForward()
+                currentWebView?.let { wv ->
+                    if (webContainer.visibility == View.VISIBLE && wv.canGoForward()) {
+                        wv.goForward()
+                    }
                 }
             }
         }
 
         btnReload.setOnClickListener {
             safelyRun {
-                if (webView.visibility == View.VISIBLE) {
-                    webView.reload()
-                } else {
-                    loadUrl(HOME_URL)
-                }
+                currentWebView?.let { wv ->
+                    if (webContainer.visibility == View.VISIBLE) {
+                        wv.reload()
+                    } else {
+                        loadUrl(getDefaultHomeUrl())
+                    }
+                } ?: loadUrl(getDefaultHomeUrl())
             }
         }
 
@@ -319,12 +343,16 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             safelyRun { onToggleAdBlocker() }
         }
 
+        btnTopTabsLayout.setOnClickListener {
+            safelyRun { showTabsDialog() }
+        }
+
         btnMenu.setOnClickListener {
             safelyRun { showTvMenu() }
         }
 
         // TV Shortcuts
-        btnShortcutBing.setOnClickListener { safelyRun { loadUrl(HOME_URL) } }
+        btnShortcutBing.setOnClickListener { safelyRun { loadUrl(BING_URL) } }
         btnShortcutGoogle.setOnClickListener { safelyRun { loadUrl(GOOGLE_URL) } }
         btnShortcutYoutube.setOnClickListener { safelyRun { loadUrl(YOUTUBE_URL) } }
         btnShortcutGemini.setOnClickListener { safelyRun { toggleGeminiPanel() } }
@@ -393,10 +421,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 Toast.makeText(this, "📥 Downloads: All files stored safely in sandbox", Toast.LENGTH_SHORT).show()
             }
         }
-        btnNavTabs.setOnClickListener {
-            safelyRun {
-                TvDialogs.showTabsDialog(this, 1) { returnToHome() }
-            }
+        btnNavTabsLayout.setOnClickListener {
+            safelyRun { showTabsDialog() }
         }
         btnNavSettings.setOnClickListener {
             safelyRun {
@@ -412,7 +438,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 if (lastFailedUrl.isNotEmpty()) {
                     loadUrl(lastFailedUrl)
                 } else {
-                    loadUrl(HOME_URL)
+                    loadUrl(getDefaultHomeUrl())
                 }
             }
         }
@@ -455,6 +481,225 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         }
     }
 
+    // ==========================================
+    // Multi-Tab Engine
+    // ==========================================
+
+    fun createTab(initialUrl: String = "", isIncognito: Boolean = false): RenderiumTab {
+        val tabWebView = WebView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
+            isFocusable = true
+            isFocusableInTouchMode = true
+            visibility = View.GONE
+        }
+
+        configureWebView(tabWebView, isIncognito)
+        webContainer.addView(tabWebView)
+
+        val tab = RenderiumTab(
+            id = UUID.randomUUID().toString(),
+            title = if (initialUrl.isNotBlank()) "Loading..." else "New Tab",
+            url = initialUrl,
+            isIncognito = isIncognito,
+            webView = tabWebView
+        )
+        tabManager.addTab(tab, makeActive = true)
+        updateTabsBadge()
+        switchToTab(tab.id)
+
+        if (initialUrl.isNotBlank()) {
+            loadUrl(initialUrl)
+        } else {
+            returnToHome()
+        }
+        return tab
+    }
+
+    fun switchToTab(tabId: String) {
+        val targetTab = tabManager.selectTab(tabId) ?: return
+
+        for (t in tabManager.tabs) {
+            t.webView.visibility = if (t.id == tabId) View.VISIBLE else View.GONE
+        }
+        virtualMouseOverlay.targetView = targetTab.webView
+
+        currentPageTitle = targetTab.title
+        currentPageUrl = targetTab.url
+
+        if (targetTab.url.isNotBlank()) {
+            etOmnibox.setText(targetTab.url)
+            webContainer.visibility = View.VISIBLE
+            homeView.visibility = View.GONE
+            topBar.visibility = View.VISIBLE
+        } else {
+            returnToHome()
+        }
+        updateTabsBadge()
+    }
+
+    fun closeTab(tabId: String) {
+        val closedTab = tabManager.removeTab(tabId) ?: return
+        webContainer.removeView(closedTab.webView)
+        safelyRun { closedTab.webView.destroy() }
+
+        if (tabManager.count == 0) {
+            createTab("", isIncognito = false)
+        } else {
+            val nextTab = tabManager.getActiveTab()
+            if (nextTab != null) {
+                switchToTab(nextTab.id)
+            }
+        }
+        updateTabsBadge()
+    }
+
+    fun closeAllTabs() {
+        val all = tabManager.clearAll()
+        for (t in all) {
+            webContainer.removeView(t.webView)
+            safelyRun { t.webView.destroy() }
+        }
+        createTab("", isIncognito = false)
+        Toast.makeText(this, "📑 All tabs closed", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateTabsBadge() {
+        val count = tabManager.count.coerceAtLeast(1)
+        val text = "$count"
+        tvTopTabsCount.text = text
+        tvNavTabsCount.text = text
+    }
+
+    private fun configureWebView(wv: WebView, isIncognito: Boolean) {
+        try {
+            val settings = wv.settings
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.databaseEnabled = true
+            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
+            settings.mediaPlaybackRequiresUserGesture = false
+            settings.cacheMode = if (isIncognito) WebSettings.LOAD_NO_CACHE else WebSettings.LOAD_DEFAULT
+            settings.userAgentString = UserAgentUtils.getUserAgent(currentUaMode)
+
+            // Enforce Renderium World-Class Security Sandbox
+            RenderiumSecurityManager.applyHardenedSecurity(wv)
+
+            // Bridge for Chrome Web Store extension installs
+            wv.addJavascriptInterface(HeliumExtensionBridge(), "HeliumExtensionBridge")
+
+            // Auto-detect .crx extension downloads
+            wv.setDownloadListener { url, _, _, mimetype, _ ->
+                if (url.endsWith(".crx", ignoreCase = true) || mimetype == "application/x-chrome-extension") {
+                    val extId = url.substringAfterLast("/").substringBefore(".crx")
+                    promptAddExtension(extId, "Chrome Extension")
+                }
+            }
+
+            wv.webViewClient = HeliumWebViewClient(
+                context = this,
+                extensionManager = extensionManager,
+                onPageStarted = { url ->
+                    runOnUiThread {
+                        val active = tabManager.getActiveTab()
+                        if (active?.webView == wv) {
+                            currentPageUrl = url
+                            active.url = url
+                            etOmnibox.setText(url)
+                            progressBar.visibility = View.VISIBLE
+                            errorContainer.visibility = View.GONE
+                            homeView.visibility = View.GONE
+                            webContainer.visibility = View.VISIBLE
+                            topBar.visibility = View.VISIBLE
+                        }
+                    }
+                },
+                onPageFinished = { url ->
+                    runOnUiThread {
+                        val active = tabManager.getActiveTab()
+                        if (active?.webView == wv) {
+                            currentPageUrl = url
+                            active.url = url
+                            etOmnibox.setText(url)
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                },
+                onError = { failingUrl, description ->
+                    runOnUiThread {
+                        val active = tabManager.getActiveTab()
+                        if (active?.webView == wv) {
+                            lastFailedUrl = failingUrl
+                            progressBar.visibility = View.GONE
+                            webContainer.visibility = View.GONE
+                            homeView.visibility = View.GONE
+                            topBar.visibility = View.VISIBLE
+                            errorContainer.visibility = View.VISIBLE
+                            tvErrorMessage.text = "Failed to load: $failingUrl\n($description)"
+                        }
+                    }
+                },
+                onBlockedResource = { count ->
+                    runOnUiThread {
+                        if (count > 0) {
+                            tvShieldCount.visibility = View.VISIBLE
+                            tvShieldCount.text = "$count"
+                            tvAlohaShieldCount.visibility = View.VISIBLE
+                            tvAlohaShieldCount.text = "$count"
+                        }
+                    }
+                },
+                onExtensionPrompt = { id, name ->
+                    runOnUiThread {
+                        promptAddExtension(id, name)
+                    }
+                }
+            )
+
+            wv.webChromeClient = HeliumWebChromeClient(
+                onProgressChanged = { progress ->
+                    runOnUiThread {
+                        val active = tabManager.getActiveTab()
+                        if (active?.webView == wv) {
+                            progressBar.progress = progress
+                            if (progress >= 100) {
+                                progressBar.visibility = View.GONE
+                            }
+                        }
+                    }
+                },
+                onTitleChanged = { title ->
+                    runOnUiThread {
+                        val active = tabManager.tabs.firstOrNull { it.webView == wv }
+                        if (active != null) {
+                            active.title = title
+                            if (active.id == tabManager.activeTabId) {
+                                currentPageTitle = title
+                            }
+                        }
+                    }
+                },
+                onCustomViewToggled = { customView, _ ->
+                    if (customView != null) {
+                        topBar.visibility = View.GONE
+                        mobileNavBar.visibility = View.GONE
+                    } else {
+                        topBar.visibility = View.VISIBLE
+                        if (preferencesManager.isAlohaMobileActive()) {
+                            mobileNavBar.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            )
+        } catch (t: Throwable) {
+            Log.e(TAG, "Fatal configuring WebView", t)
+        }
+    }
+
     fun promptAddExtension(extensionId: String, extensionName: String) {
         TvDialogs.showAddExtensionDialog(
             context = this,
@@ -485,7 +730,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 edgeArcTvContainer.visibility = View.GONE
                 mobileNavBar.visibility = View.VISIBLE
                 virtualMouseOverlay.visibility = View.GONE
-                topBar.visibility = if (webView.visibility == View.VISIBLE) View.VISIBLE else View.GONE
+                topBar.visibility = if (webContainer.visibility == View.VISIBLE) View.VISIBLE else View.GONE
             } else {
                 alohaMobileContainer.visibility = View.GONE
                 edgeArcTvContainer.visibility = View.VISIBLE
@@ -495,121 +740,35 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
             alohaNewsSection.visibility = if (preferencesManager.showNewsFeed) View.VISIBLE else View.GONE
 
+            // Dynamically match Search Engine Logo & Hint to prevent mismatches
             val engine = preferencesManager.searchEngine
-            etOmnibox.hint = "Search $engine or enter URL"
-            etAlohaSearch.hint = "Search in $engine or enter URL"
-            etCenterSearch.hint = "Search $engine"
+            when (engine.lowercase()) {
+                "google" -> {
+                    ivCenterSearchLogo.setImageResource(R.drawable.ic_google_g)
+                    etCenterSearch.hint = "Search Google"
+                    etOmnibox.hint = "Search Google or enter URL"
+                    etAlohaSearch.hint = "Search Google or enter URL"
+                }
+                "bing" -> {
+                    ivCenterSearchLogo.setImageResource(R.drawable.ic_bing)
+                    etCenterSearch.hint = "Search Bing"
+                    etOmnibox.hint = "Search Bing or enter URL"
+                    etAlohaSearch.hint = "Search Bing or enter URL"
+                }
+                else -> {
+                    ivCenterSearchLogo.setImageResource(R.drawable.ic_search)
+                    etCenterSearch.hint = "Search $engine"
+                    etOmnibox.hint = "Search $engine or enter URL"
+                    etAlohaSearch.hint = "Search $engine or enter URL"
+                }
+            }
         }
     }
 
-    private fun initWebView() {
-        try {
-            val settings = webView.settings
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-            settings.databaseEnabled = true
-            settings.useWideViewPort = true
-            settings.loadWithOverviewMode = true
-            settings.mediaPlaybackRequiresUserGesture = false
-            settings.cacheMode = WebSettings.LOAD_DEFAULT
-            settings.userAgentString = UserAgentUtils.getUserAgent(currentUaMode)
-
-            // Hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-
-            // Enforce Renderium World-Class Security Sandbox
-            RenderiumSecurityManager.applyHardenedSecurity(webView)
-
-            // Bridge for Chrome Web Store extension installs
-            webView.addJavascriptInterface(HeliumExtensionBridge(), "HeliumExtensionBridge")
-
-            // Auto-detect .crx extension downloads
-            webView.setDownloadListener { url, _, _, mimetype, _ ->
-                if (url.endsWith(".crx", ignoreCase = true) || mimetype == "application/x-chrome-extension") {
-                    val extId = url.substringAfterLast("/").substringBefore(".crx")
-                    promptAddExtension(extId, "Chrome Extension")
-                }
-            }
-
-            webView.webViewClient = HeliumWebViewClient(
-                context = this,
-                extensionManager = extensionManager,
-                onPageStarted = { url ->
-                    runOnUiThread {
-                        currentPageUrl = url
-                        etOmnibox.setText(url)
-                        progressBar.visibility = View.VISIBLE
-                        errorContainer.visibility = View.GONE
-                        homeView.visibility = View.GONE
-                        webView.visibility = View.VISIBLE
-                        topBar.visibility = View.VISIBLE
-                    }
-                },
-                onPageFinished = { url ->
-                    runOnUiThread {
-                        currentPageUrl = url
-                        etOmnibox.setText(url)
-                        progressBar.visibility = View.GONE
-                    }
-                },
-                onError = { failingUrl, description ->
-                    runOnUiThread {
-                        lastFailedUrl = failingUrl
-                        progressBar.visibility = View.GONE
-                        webView.visibility = View.GONE
-                        homeView.visibility = View.GONE
-                        topBar.visibility = View.VISIBLE
-                        errorContainer.visibility = View.VISIBLE
-                        tvErrorMessage.text = "Failed to load: $failingUrl\n($description)"
-                    }
-                },
-                onBlockedResource = { count ->
-                    runOnUiThread {
-                        if (count > 0) {
-                            tvShieldCount.visibility = View.VISIBLE
-                            tvShieldCount.text = "$count"
-                            tvAlohaShieldCount.visibility = View.VISIBLE
-                            tvAlohaShieldCount.text = "$count"
-                        }
-                    }
-                },
-                onExtensionPrompt = { id, name ->
-                    runOnUiThread {
-                        promptAddExtension(id, name)
-                    }
-                }
-            )
-
-            webView.webChromeClient = HeliumWebChromeClient(
-                onProgressChanged = { progress ->
-                    runOnUiThread {
-                        progressBar.progress = progress
-                        if (progress >= 100) {
-                            progressBar.visibility = View.GONE
-                        }
-                    }
-                },
-                onTitleChanged = { title ->
-                    runOnUiThread {
-                        currentPageTitle = title
-                    }
-                },
-                onCustomViewToggled = { customView, _ ->
-                    if (customView != null) {
-                        topBar.visibility = View.GONE
-                        mobileNavBar.visibility = View.GONE
-                    } else {
-                        topBar.visibility = View.VISIBLE
-                        if (preferencesManager.isAlohaMobileActive()) {
-                            mobileNavBar.visibility = View.VISIBLE
-                        }
-                    }
-                }
-            )
-
-            virtualMouseOverlay.targetView = webView
-        } catch (t: Throwable) {
-            Log.e(TAG, "Fatal initializing Chromium WebView", t)
+    private fun getDefaultHomeUrl(): String {
+        return when (preferencesManager.searchEngine.lowercase()) {
+            "google" -> GOOGLE_URL
+            else -> BING_URL
         }
     }
 
@@ -683,10 +842,19 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     fun processInput(rawInput: String): String {
         val text = rawInput.trim()
-        if (text.isEmpty()) return HOME_URL
+        if (text.isEmpty()) return getDefaultHomeUrl()
 
+        // Protocol URLs
         if (text.startsWith("http://", ignoreCase = true) || text.startsWith("https://", ignoreCase = true)) {
             return RenderiumSecurityManager.upgradeToHttps(text)
+        }
+
+        // Direct aliases for popular search engines & domains
+        when (text.lowercase()) {
+            "google", "google.com", "www.google.com" -> return GOOGLE_URL
+            "bing", "bing.com", "www.bing.com" -> return BING_URL
+            "youtube", "youtube.com", "www.youtube.com" -> return YOUTUBE_URL
+            "duckduckgo", "duckduckgo.com" -> return "https://duckduckgo.com"
         }
 
         val domainPattern = Regex("^[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+(/.*)?$")
@@ -711,17 +879,25 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         progressBar.visibility = View.VISIBLE
         errorContainer.visibility = View.GONE
         homeView.visibility = View.GONE
-        webView.visibility = View.VISIBLE
+        webContainer.visibility = View.VISIBLE
         topBar.visibility = View.VISIBLE
 
         safelyRun {
-            webView.loadUrl(secureUrl)
+            val activeTab = tabManager.getActiveTab()
+            if (activeTab != null) {
+                activeTab.url = secureUrl
+                activeTab.webView.visibility = View.VISIBLE
+                activeTab.webView.loadUrl(secureUrl)
+                virtualMouseOverlay.targetView = activeTab.webView
+            } else {
+                createTab(secureUrl, isIncognito = false)
+            }
         }
     }
 
     fun returnToHome() {
         homeView.visibility = View.VISIBLE
-        webView.visibility = View.GONE
+        webContainer.visibility = View.GONE
         errorContainer.visibility = View.GONE
         progressBar.visibility = View.GONE
         currentPageUrl = ""
@@ -729,34 +905,60 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         etCenterSearch.setText("")
         etAlohaSearch.setText("")
 
+        tabManager.getActiveTab()?.url = ""
+
         applyUserPreferences()
     }
 
     private fun showTvMenu() {
-        TvDialogs.showMenuDialog(
+        TvDialogs.showChromeMenuDialog(
             context = this,
-            onGeminiClick = { toggleGeminiPanel() },
-            onPointerToggle = { onToggleMousePointer() },
-            onUserAgentClick = { cycleUserAgent() },
-            onSearchEngineClick = {
-                TvDialogs.showSearchEngineDialog(this, openSearchManager) { selected ->
-                    preferencesManager.searchEngine = selected.shortName
-                    applyUserPreferences()
-                }
-            },
-            onPipClick = { onTogglePipMode() },
-            onReloadClick = { webView.reload() },
-            onClearDataClick = {
+            isDesktopMode = (currentUaMode == UserAgentMode.DESKTOP),
+            currentSearchEngine = preferencesManager.searchEngine,
+            tabCount = tabManager.count,
+            onBack = { safelyRun { onNavigateBack() } },
+            onForward = {
                 safelyRun {
-                    RenderiumSecurityManager.clearPrivateData(webView) {
-                        runOnUiThread {
-                            Toast.makeText(this, "🛡️ Renderium: Private Data & Cache Cleared!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    currentWebView?.let { if (it.canGoForward()) it.goForward() }
                 }
             },
-            onSettingsClick = {
-                TvDialogs.showSettingsDialog(this, preferencesManager) {
+            onReload = {
+                safelyRun {
+                    currentWebView?.reload() ?: loadUrl(getDefaultHomeUrl())
+                }
+            },
+            onHome = { safelyRun { returnToHome() } },
+            onPip = { safelyRun { onTogglePipMode() } },
+            onNewTab = {
+                safelyRun {
+                    createTab("", isIncognito = false)
+                    Toast.makeText(this, "➕ New Tab", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onNewIncognitoTab = {
+                safelyRun {
+                    createTab("", isIncognito = true)
+                    Toast.makeText(this, "🕶️ Incognito Tab", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onTabsOverview = {
+                safelyRun { showTabsDialog() }
+            },
+            onToggleDesktopMode = { enableDesktop ->
+                currentUaMode = if (enableDesktop) UserAgentMode.DESKTOP else UserAgentMode.TV
+                for (t in tabManager.tabs) {
+                    t.webView.settings.userAgentString = UserAgentUtils.getUserAgent(currentUaMode)
+                }
+                currentWebView?.reload()
+                Toast.makeText(
+                    this,
+                    if (enableDesktop) "🖥️ Desktop Site: ON" else "📱 Mobile/TV Site: ON",
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
+            onSearchEngineClick = {
+                TvDialogs.showSearchEngineDialog(this, preferencesManager.searchEngine) { selected ->
+                    preferencesManager.searchEngine = selected
                     applyUserPreferences()
                 }
             },
@@ -767,21 +969,40 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                     onOpenWebStore = { loadUrl(STORE_URL) },
                     onRefresh = { /* refreshed */ }
                 )
+            },
+            onGeminiClick = { toggleGeminiPanel() },
+            onPointerToggle = { onToggleMousePointer() },
+            onSettingsClick = {
+                TvDialogs.showSettingsDialog(this, preferencesManager) {
+                    applyUserPreferences()
+                }
+            },
+            onClearDataClick = {
+                safelyRun {
+                    currentWebView?.let { wv ->
+                        RenderiumSecurityManager.clearPrivateData(wv) {
+                            runOnUiThread {
+                                Toast.makeText(this, "🛡️ Renderium: Private Data & Cache Cleared!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
             }
         )
     }
 
-    private fun cycleUserAgent() {
-        currentUaMode = when (currentUaMode) {
-            UserAgentMode.TV -> UserAgentMode.DESKTOP
-            UserAgentMode.DESKTOP -> UserAgentMode.MOBILE
-            UserAgentMode.MOBILE -> UserAgentMode.TV
-        }
-        safelyRun {
-            webView.settings.userAgentString = UserAgentUtils.getUserAgent(currentUaMode)
-            webView.reload()
-            Toast.makeText(this, "User-Agent: ${currentUaMode.name}", Toast.LENGTH_SHORT).show()
-        }
+    private fun showTabsDialog() {
+        TvDialogs.showTabsDialog(
+            context = this,
+            tabManager = tabManager,
+            onSelectTab = { id -> switchToTab(id) },
+            onCloseTab = { id -> closeTab(id) },
+            onNewTab = {
+                createTab("", isIncognito = false)
+                Toast.makeText(this, "➕ New Tab", Toast.LENGTH_SHORT).show()
+            },
+            onCloseAllTabs = { closeAllTabs() }
+        )
     }
 
     private inline fun safelyRun(block: () -> Unit) {
@@ -846,13 +1067,15 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             returnToHome()
             return true
         }
-        if (webView.visibility == View.VISIBLE) {
-            if (webView.canGoBack()) {
-                webView.goBack()
-                return true
-            } else {
-                returnToHome()
-                return true
+        if (webContainer.visibility == View.VISIBLE) {
+            currentWebView?.let { wv ->
+                if (wv.canGoBack()) {
+                    wv.goBack()
+                    return true
+                } else {
+                    returnToHome()
+                    return true
+                }
             }
         }
         return false
@@ -881,7 +1104,9 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     override fun onDestroy() {
         super.onDestroy()
         safelyRun {
-            webView.destroy()
+            for (tab in tabManager.tabs) {
+                tab.webView.destroy()
+            }
         }
     }
 }

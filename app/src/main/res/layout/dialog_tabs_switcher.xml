@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_liquid_glass_dialog"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header: Tabs Overview, Count, Add Tab & Close -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="Tabs"
+            android:src="@drawable/ic_tabs" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Tabs Manager"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTabsSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="1 tab open"
+                android:textColor="#38BDF8"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDialogNewTab"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_liquid_glass_button"
+            android:fontFamily="sans-serif-bold"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="➕ New Tab"
+            android:textColor="#00E5FF"
+            android:textSize="12sp" />
+
+        <ImageButton
+            android:id="@+id/btnDialogCloseTabs"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_liquid_glass_button"
+            android:contentDescription="Close"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_close" />
+    </LinearLayout>
+
+    <!-- Scrollable container for tab cards -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_maxHeight="360dp"
+        android:overScrollMode="ifContentScrolls">
+
+        <LinearLayout
+            android:id="@+id/tabsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <!-- Bottom Actions: Close All Tabs -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCloseAllTabs"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_liquid_glass_button"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="🗑️ Close All Tabs"
+            android:textColor="#F87171"
+            android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>
