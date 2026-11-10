@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.SafeBrowsingResponse
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -13,12 +14,14 @@ import android.webkit.WebViewClient
 import kotlinx.coroutines.runBlocking
 import org.helium.tv.browser.adblock.RustAdBlocker
 import org.helium.tv.browser.extensions.ExtensionManager
+import org.helium.tv.browser.security.RenderiumSecurityManager
 import java.io.ByteArrayInputStream
 import java.util.regex.Pattern
 
 /**
- * Chromium WebView Client with Rust Adblock, Chrome Web Store extension interception,
- * content script injection, and crash-proof error recovery.
+ * Chromium WebView Client with Renderium World-Class Security, Rust Adblock,
+ * SafeBrowsing malware/phishing interception, Chrome Web Store extension injection,
+ * and crash-proof error recovery.
  */
 class HeliumWebViewClient(
     private val context: Context,
@@ -31,7 +34,7 @@ class HeliumWebViewClient(
 ) : WebViewClient() {
 
     companion object {
-        private const val TAG = "HeliumWebViewClient"
+        private const val TAG = "RenderiumWebViewClient"
         private val STORE_DETAIL_PATTERN = Pattern.compile(
             "https?://(chromewebstore|chrome)\\.google\\.com/(webstore/)?detail/([^/?#]+)/([a-p]{32})",
             Pattern.CASE_INSENSITIVE
@@ -67,7 +70,16 @@ class HeliumWebViewClient(
                 ?: urlStr.substringAfterLast("/").substringBefore(".crx")
             if (extId.length == 32) {
                 onExtensionPrompt(extId, "Chrome Extension")
-                return true // Handled via native install popup
+                return true
+            }
+        }
+
+        // HTTPS Everywhere: Automatically upgrade plain http to https
+        if (scheme == "http") {
+            val upgraded = RenderiumSecurityManager.upgradeToHttps(urlStr)
+            if (upgraded != urlStr) {
+                view?.loadUrl(upgraded)
+                return true
             }
         }
 
@@ -137,22 +149,20 @@ class HeliumWebViewClient(
                 val extId = matcher.group(4) ?: ""
                 val cleanName = slug.split("-").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
-                // Inject floating Liquid Glass "Add Extension to Helium" bar & button on Chrome Web Store
                 val injectScript = """
                     (function() {
-                        if (document.getElementById('helium-ext-banner')) return;
+                        if (document.getElementById('renderium-ext-banner')) return;
                         var banner = document.createElement('div');
-                        banner.id = 'helium-ext-banner';
+                        banner.id = 'renderium-ext-banner';
                         banner.style.position = 'fixed';
                         banner.style.bottom = '70px';
                         banner.style.right = '20px';
                         banner.style.zIndex = '99999999';
-                        banner.style.background = 'rgba(20, 22, 32, 0.88)';
-                        banner.style.backdropFilter = 'blur(16px)';
-                        banner.style.border = '1.5px solid rgba(255, 255, 255, 0.25)';
-                        banner.style.borderRadius = '24px';
-                        banner.style.padding = '10px 18px';
-                        banner.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.5)';
+                        banner.style.background = 'rgba(11, 16, 29, 0.95)';
+                        banner.style.border = '1.5px solid rgba(56, 189, 248, 0.5)';
+                        banner.style.borderRadius = '28dp';
+                        banner.style.padding = '12px 20px';
+                        banner.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.7)';
                         banner.style.cursor = 'pointer';
                         banner.style.display = 'flex';
                         banner.style.alignItems = 'center';
@@ -160,7 +170,7 @@ class HeliumWebViewClient(
                         banner.style.fontFamily = '-apple-system, BlinkMacSystemFont, sans-serif';
                         banner.style.fontSize = '14px';
                         banner.style.fontWeight = 'bold';
-                        banner.innerHTML = '🧩 Add to Helium Browser';
+                        banner.innerHTML = '🧩 Add to Renderium';
                         banner.onclick = function() {
                             if (window.HeliumExtensionBridge) {
                                 window.HeliumExtensionBridge.requestInstall('$extId', '$cleanName');
@@ -190,6 +200,13 @@ class HeliumWebViewClient(
         } catch (t: Throwable) {
             Log.w(TAG, "Error injecting Chrome Web Store banner", t)
         }
+    }
+
+    override fun onSafeBrowsingHit(view: WebView?, request: WebResourceRequest?, threatType: Int, callback: SafeBrowsingResponse?) {
+        val failingUrl = request?.url?.toString() ?: ""
+        Log.w(TAG, "Safe Browsing Threat intercepted ($threatType) on: $failingUrl")
+        callback?.backToSafety(true)
+        onError(failingUrl, "🛡️ Renderium Security blocked malicious/phishing threat.")
     }
 
     override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {

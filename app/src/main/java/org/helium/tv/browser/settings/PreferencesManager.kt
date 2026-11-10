@@ -23,7 +23,7 @@ enum class HomeLayoutMode(val title: String) {
 class PreferencesManager(private val context: Context) {
 
     companion object {
-        private const val PREFS_NAME = "helium_browser_prefs"
+        private const val PREFS_NAME = "renderium_browser_prefs"
         private const val KEY_THEME = "wallpaper_theme"
         private const val KEY_LAYOUT = "home_layout_mode"
         private const val KEY_SEARCH_ENGINE = "default_search_engine"

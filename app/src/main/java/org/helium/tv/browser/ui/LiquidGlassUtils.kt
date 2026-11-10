@@ -1,45 +1,29 @@
 package org.helium.tv.browser.ui
 
-import android.graphics.RenderEffect
-import android.graphics.Shader
-import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 
 /**
- * Utility for modern Apple-style 'Liquid Glass' (frosted translucent glassmorphism)
- * effects, hardware-accelerated blur, and smooth 150ms spring/ease-out native animations.
+ * Utility for modern Apple-style 'Liquid Glass' crisp high-contrast glassmorphism,
+ * hardware-accelerated rendering, and smooth 150ms spring/ease-out native animations.
  */
 object LiquidGlassUtils {
 
     private val easeOutInterpolator = DecelerateInterpolator(1.5f)
 
     /**
-     * Applies native Android RenderEffect.createBlurEffect on Android 12+ (API 31+).
-     * Automatically falls back to clean translucent glass on older Android/TV API levels.
-     */
-    fun applyBlur(view: View, radiusX: Float = 20f, radiusY: Float = 20f) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            try {
-                view.setRenderEffect(RenderEffect.createBlurEffect(radiusX, radiusY, Shader.TileMode.CLAMP))
-            } catch (t: Throwable) {
-                // Graceful fallback on custom TV ROMs where RenderEffect is disabled
-            }
-        }
-    }
-
-    /**
      * Attaches lightweight 150ms ease-out scale feedback for button presses.
+     * Keeps all buttons, icons, and text razor-sharp without blur distortion.
      */
-    fun attachTouchFeedback(view: View, targetScale: Float = 0.95f) {
+    fun attachTouchFeedback(view: View, targetScale: Float = 0.94f) {
         view.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     v.animate()
                         .scaleX(targetScale)
                         .scaleY(targetScale)
-                        .setDuration(120)
+                        .setDuration(100)
                         .setInterpolator(easeOutInterpolator)
                         .start()
                 }
@@ -60,8 +44,8 @@ object LiquidGlassUtils {
      * Smooth 150ms focus/expansion animation for address bars and search pills.
      */
     fun animatePillFocus(view: View, hasFocus: Boolean) {
-        val targetElevation = if (hasFocus) 8f else 2f
-        val targetScale = if (hasFocus) 1.02f else 1.0f
+        val targetElevation = if (hasFocus) 8f else 3f
+        val targetScale = if (hasFocus) 1.015f else 1.0f
         view.animate()
             .scaleX(targetScale)
             .scaleY(targetScale)

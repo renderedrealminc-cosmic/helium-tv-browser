@@ -192,10 +192,10 @@
                 android:layout_width="220dp"
                 android:layout_height="220dp"
                 android:layout_gravity="center"
-                android:alpha="0.85"
-                android:contentDescription="Liquid Orb"
+                android:alpha="0.90"
+                android:contentDescription="Renderium Orb"
                 android:scaleType="centerCrop"
-                android:src="@drawable/helium_logo" />
+                android:src="@drawable/renderium_logo" />
 
             <!-- Main TV Home Vertical Content -->
             <LinearLayout
@@ -206,42 +206,71 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp">
 
-                <!-- Center Prominent Search Stadium Pill (Liquid Glass) -->
+                <!-- Center Prominent Search Stadium Pill & Voice Button (Matches Reference Screenshot) -->
                 <LinearLayout
-                    android:id="@+id/centerSearchContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:maxWidth="520dp"
-                    android:background="@drawable/bg_liquid_glass_pill"
-                    android:elevation="6dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
+                    android:layout_height="wrap_content"
+                    android:maxWidth="560dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/ivCenterSearchLogo"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="12dp"
-                        android:contentDescription="Search Provider"
-                        android:src="@drawable/ic_google_g" />
+                    <LinearLayout
+                        android:id="@+id/centerSearchContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_liquid_glass_pill"
+                        android:elevation="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
 
-                    <EditText
-                        android:id="@+id/etCenterSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@null"
-                        android:fontFamily="sans-serif-medium"
-                        android:hint="Search the web"
-                        android:imeOptions="actionSearch"
-                        android:inputType="textUri"
-                        android:letterSpacing="-0.01"
-                        android:singleLine="true"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#94A3B8"
-                        android:textCursorDrawable="@null"
-                        android:textSize="15sp" />
+                        <ImageView
+                            android:id="@+id/ivCenterSearchLogo"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:contentDescription="Search Provider"
+                            android:src="@drawable/ic_google_g" />
+
+                        <EditText
+                            android:id="@+id/etCenterSearch"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:fontFamily="sans-serif-medium"
+                            android:hint="Search the web"
+                            android:imeOptions="actionSearch"
+                            android:inputType="textUri"
+                            android:letterSpacing="-0.01"
+                            android:singleLine="true"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#94A3B8"
+                            android:textCursorDrawable="@null"
+                            android:textSize="15sp" />
+
+                        <ImageView
+                            android:id="@+id/ivCenterSearchMic"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_marginStart="8dp"
+                            android:contentDescription="Mic"
+                            android:src="@drawable/ic_mic" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnCenterVoiceSearch"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_liquid_glass_button"
+                        android:contentDescription="Voice Search"
+                        android:elevation="6dp"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_mic" />
                 </LinearLayout>
 
                 <!-- Quick Speed Dial Circular Icons (Glossy Liquid Glass Buttons) -->
@@ -263,7 +292,7 @@
                         android:elevation="4dp"
                         android:focusable="true"
                         android:scaleType="centerInside"
-                        android:src="@drawable/helium_logo" />
+                        android:src="@drawable/renderium_logo" />
 
                     <!-- Google Shortcut -->
                     <ImageButton
@@ -353,8 +382,8 @@
                     <ImageView
                         android:layout_width="26dp"
                         android:layout_height="26dp"
-                        android:contentDescription="Helium Logo"
-                        android:src="@drawable/helium_logo" />
+                        android:contentDescription="Renderium Logo"
+                        android:src="@drawable/renderium_logo" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -363,7 +392,7 @@
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="-0.02"
-                        android:text="Helium"
+                        android:text="Renderium"
                         android:textColor="#FFFFFF"
                         android:textSize="20sp"
                         android:textStyle="bold" />

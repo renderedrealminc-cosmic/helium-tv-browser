@@ -31,6 +31,7 @@ import org.helium.tv.browser.input.TvKeyHandler
 import org.helium.tv.browser.input.VirtualMouseOverlay
 import org.helium.tv.browser.pip.FloatingPipManager
 import org.helium.tv.browser.search.OpenSearchManager
+import org.helium.tv.browser.security.RenderiumSecurityManager
 import org.helium.tv.browser.settings.PreferencesManager
 import org.helium.tv.browser.ui.LiquidGlassUtils
 import org.helium.tv.browser.ui.TvDialogs
@@ -40,7 +41,7 @@ import org.helium.tv.browser.utils.UserAgentUtils
 class MainActivity : AppCompatActivity(), TvActionListener {
 
     companion object {
-        private const val TAG = "HeliumMainActivity"
+        private const val TAG = "RenderiumMainActivity"
         const val HOME_URL = "https://www.bing.com"
         const val GOOGLE_URL = "https://www.google.com"
         const val YOUTUBE_URL = "https://www.youtube.com"
@@ -78,6 +79,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     // TV Layout Elements
     private lateinit var centerSearchContainer: View
     private lateinit var etCenterSearch: EditText
+    private lateinit var btnCenterVoiceSearch: ImageButton
     private lateinit var btnShortcutBing: ImageButton
     private lateinit var btnShortcutGoogle: ImageButton
     private lateinit var btnShortcutYoutube: ImageButton
@@ -201,6 +203,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         // TV Layout Views
         centerSearchContainer = findViewById(R.id.centerSearchContainer)
         etCenterSearch = findViewById(R.id.etCenterSearch)
+        btnCenterVoiceSearch = findViewById(R.id.btnCenterVoiceSearch)
         btnShortcutBing = findViewById(R.id.btnShortcutBing)
         btnShortcutGoogle = findViewById(R.id.btnShortcutGoogle)
         btnShortcutYoutube = findViewById(R.id.btnShortcutYoutube)
@@ -250,11 +253,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnRetry = findViewById(R.id.btnRetry)
         btnErrorHome = findViewById(R.id.btnErrorHome)
 
-        // Apply Native Android RenderEffect Blur (API 31+ with fallback)
-        LiquidGlassUtils.applyBlur(topBar, 20f, 20f)
-        LiquidGlassUtils.applyBlur(mobileNavBar, 20f, 20f)
-
-        // Attach 150ms smooth spring/ease-out animations
+        // Attach crisp 150ms spring/ease-out animations (no blur distortion)
         attachLiquidAnimations()
 
         setupListeners()
@@ -263,7 +262,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private fun attachLiquidAnimations() {
         val buttonsToAnimate = listOf(
             btnBack, btnForward, btnReload, btnHome, btnShieldLayout, btnMenu,
-            btnShortcutBing, btnShortcutGoogle, btnShortcutYoutube, btnShortcutGemini,
+            btnShortcutBing, btnShortcutGoogle, btnShortcutYoutube, btnShortcutGemini, btnCenterVoiceSearch,
             btnAlohaGift, btnAlohaQr, btnAlohaSettings, btnAlohaShield, btnAlohaAi,
             tileGoogle, tileX, tileEbay, tileBooking, tileSkyscanner, tileWeather, tileYoutube, tileAdd,
             pillHot, pillNews, pillEntertainment, pillSports, pillMoney,
@@ -284,7 +283,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     private fun setupListeners() {
-        // Navigation button listeners
         btnBack.setOnClickListener {
             safelyRun {
                 if (webView.visibility == View.VISIBLE && webView.canGoBack()) {
@@ -331,10 +329,17 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnShortcutYoutube.setOnClickListener { safelyRun { loadUrl(YOUTUBE_URL) } }
         btnShortcutGemini.setOnClickListener { safelyRun { toggleGeminiPanel() } }
 
+        btnCenterVoiceSearch.setOnClickListener {
+            safelyRun {
+                etCenterSearch.requestFocus()
+                Toast.makeText(this, "🎙️ Voice Search ready", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         // Aloha Header Buttons
         btnAlohaGift.setOnClickListener {
             safelyRun {
-                Toast.makeText(this, "🎁 Helium Browser: Fast, Lightweight & Ad-Free!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "🎁 Renderium Browser: Fast, Ultra-Secure & Ad-Free!", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -385,7 +390,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnNavMenu.setOnClickListener { safelyRun { showTvMenu() } }
         btnNavDownloads.setOnClickListener {
             safelyRun {
-                Toast.makeText(this, "📥 Downloads: All files stored safely", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "📥 Downloads: All files stored safely in sandbox", Toast.LENGTH_SHORT).show()
             }
         }
         btnNavTabs.setOnClickListener {
@@ -461,7 +466,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                     val result = extensionManager.installExtension(extensionId, extensionName)
                     if (result.isSuccess) {
                         val ext = result.getOrNull()
-                        Toast.makeText(this@MainActivity, "✅ \"${ext?.name ?: extensionName}\" added to Helium! 🎉", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, "✅ \"${ext?.name ?: extensionName}\" added to Renderium! 🎉", Toast.LENGTH_LONG).show()
                     } else {
                         val err = result.exceptionOrNull()?.message ?: "Unknown error"
                         Toast.makeText(this@MainActivity, "❌ Could not install extension: $err", Toast.LENGTH_LONG).show()
@@ -473,10 +478,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     private fun applyUserPreferences() {
         safelyRun {
-            // 1. Set root wallpaper background
             rootLayout.setBackgroundResource(preferencesManager.theme.drawableRes)
 
-            // 2. Select layout mode
             if (preferencesManager.isAlohaMobileActive()) {
                 alohaMobileContainer.visibility = View.VISIBLE
                 edgeArcTvContainer.visibility = View.GONE
@@ -490,10 +493,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                 topBar.visibility = View.VISIBLE
             }
 
-            // 3. News Feed visibility
             alohaNewsSection.visibility = if (preferencesManager.showNewsFeed) View.VISIBLE else View.GONE
 
-            // 4. Update search hints
             val engine = preferencesManager.searchEngine
             etOmnibox.hint = "Search $engine or enter URL"
             etAlohaSearch.hint = "Search in $engine or enter URL"
@@ -509,14 +510,15 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             settings.databaseEnabled = true
             settings.useWideViewPort = true
             settings.loadWithOverviewMode = true
-            settings.setSupportMultipleWindows(false)
             settings.mediaPlaybackRequiresUserGesture = false
-            settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.userAgentString = UserAgentUtils.getUserAgent(currentUaMode)
 
             // Hardware acceleration
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+
+            // Enforce Renderium World-Class Security Sandbox
+            RenderiumSecurityManager.applyHardenedSecurity(webView)
 
             // Bridge for Chrome Web Store extension installs
             webView.addJavascriptInterface(HeliumExtensionBridge(), "HeliumExtensionBridge")
@@ -619,8 +621,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnQuickHindi = findViewById(R.id.btnQuickHindi)
         tvGeminiResponse = findViewById(R.id.tvGeminiResponse)
 
-        LiquidGlassUtils.applyBlur(geminiPanel, 24f, 24f)
-
         btnCloseGemini.setOnClickListener {
             geminiPanel.visibility = View.GONE
         }
@@ -686,7 +686,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         if (text.isEmpty()) return HOME_URL
 
         if (text.startsWith("http://", ignoreCase = true) || text.startsWith("https://", ignoreCase = true)) {
-            return text
+            return RenderiumSecurityManager.upgradeToHttps(text)
         }
 
         val domainPattern = Regex("^[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+(/.*)?$")
@@ -705,8 +705,9 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     fun loadUrl(url: String) {
         if (url.isBlank()) return
 
-        currentPageUrl = url
-        etOmnibox.setText(url)
+        val secureUrl = RenderiumSecurityManager.upgradeToHttps(url)
+        currentPageUrl = secureUrl
+        etOmnibox.setText(secureUrl)
         progressBar.visibility = View.VISIBLE
         errorContainer.visibility = View.GONE
         homeView.visibility = View.GONE
@@ -714,7 +715,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         topBar.visibility = View.VISIBLE
 
         safelyRun {
-            webView.loadUrl(url)
+            webView.loadUrl(secureUrl)
         }
     }
 
@@ -747,10 +748,11 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             onReloadClick = { webView.reload() },
             onClearDataClick = {
                 safelyRun {
-                    webView.clearCache(true)
-                    webView.clearHistory()
-                    android.webkit.CookieManager.getInstance().removeAllCookies(null)
-                    Toast.makeText(this, "Cache & Cookies cleared!", Toast.LENGTH_SHORT).show()
+                    RenderiumSecurityManager.clearPrivateData(webView) {
+                        runOnUiThread {
+                            Toast.makeText(this, "🛡️ Renderium: Private Data & Cache Cleared!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             },
             onSettingsClick = {
@@ -824,7 +826,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     override fun onToggleAdBlocker() {
         val count = RustAdBlocker.getBlockedCount()
-        Toast.makeText(this, "🛡️ Rust AdBlocker: $count ads blocked", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "🛡️ Renderium Security: $count ads & trackers blocked", Toast.LENGTH_SHORT).show()
     }
 
     override fun onTogglePipMode() {

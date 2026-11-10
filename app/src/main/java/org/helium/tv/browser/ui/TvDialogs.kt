@@ -25,13 +25,13 @@ object TvDialogs {
         onCancel: (() -> Unit)? = null
     ) {
         try {
-            val message = "Do you want to add \"$extensionName\" to Helium?\n\n" +
+            val message = "Do you want to add \"$extensionName\" to Renderium?\n\n" +
                     "It can:\n" +
                     "• Read and change all your data on the websites you visit\n" +
                     "• Modify web page content and block requests"
 
             val dialog = AlertDialog.Builder(context)
-                .setTitle("🧩 Add Extension to Helium?")
+                .setTitle("🧩 Add Extension to Renderium?")
                 .setMessage(message)
                 .setPositiveButton("Add Extension") { d, _ ->
                     d.dismiss()

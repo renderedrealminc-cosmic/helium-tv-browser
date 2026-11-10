@@ -13,7 +13,7 @@ class HeliumTvApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(TAG, "Initializing Helium TV Browser...")
+        Log.i(TAG, "Initializing Renderium Browser...")
         // Pre-warm Chromium WebView and native Rust adblock engine
         try {
             RustAdBlocker.getBlockedCount()
