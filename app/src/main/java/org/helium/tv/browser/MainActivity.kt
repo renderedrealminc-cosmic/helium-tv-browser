@@ -29,6 +29,7 @@ import org.helium.tv.browser.input.TvKeyHandler
 import org.helium.tv.browser.input.VirtualMouseOverlay
 import org.helium.tv.browser.pip.FloatingPipManager
 import org.helium.tv.browser.search.OpenSearchManager
+import org.helium.tv.browser.settings.PreferencesManager
 import org.helium.tv.browser.ui.TvDialogs
 import org.helium.tv.browser.utils.UserAgentMode
 import org.helium.tv.browser.utils.UserAgentUtils
@@ -42,12 +43,14 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         const val YOUTUBE_URL = "https://www.youtube.com"
     }
 
+    private lateinit var rootLayout: View
     private lateinit var webView: WebView
     private lateinit var virtualMouseOverlay: VirtualMouseOverlay
     private lateinit var tvKeyHandler: TvKeyHandler
     private lateinit var pipManager: FloatingPipManager
     private lateinit var filterManager: FilterListManager
     private lateinit var openSearchManager: OpenSearchManager
+    private lateinit var preferencesManager: PreferencesManager
 
     // Top Chromium Omnibox Bar Views
     private lateinit var topBar: View
@@ -61,13 +64,54 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var btnMenu: ImageButton
     private lateinit var progressBar: ProgressBar
 
-    // Home Screen Views
+    // Home Screen Containers
     private lateinit var homeView: View
+    private lateinit var edgeArcTvContainer: View
+    private lateinit var alohaMobileContainer: View
+
+    // TV Layout Elements
     private lateinit var etCenterSearch: EditText
     private lateinit var btnShortcutBing: ImageButton
     private lateinit var btnShortcutGoogle: ImageButton
     private lateinit var btnShortcutYoutube: ImageButton
     private lateinit var btnShortcutGemini: ImageButton
+
+    // Aloha Mobile Layout Elements
+    private lateinit var btnAlohaGift: ImageButton
+    private lateinit var btnAlohaQr: ImageButton
+    private lateinit var btnAlohaSettings: ImageButton
+    private lateinit var btnAlohaShield: View
+    private lateinit var tvAlohaShieldCount: TextView
+    private lateinit var etAlohaSearch: EditText
+    private lateinit var btnAlohaAi: View
+
+    // Aloha Shortcut Tiles
+    private lateinit var tileGoogle: View
+    private lateinit var tileX: View
+    private lateinit var tileEbay: View
+    private lateinit var tileBooking: View
+    private lateinit var tileSkyscanner: View
+    private lateinit var tileWeather: View
+    private lateinit var tileYoutube: View
+    private lateinit var tileAdd: View
+
+    // Microsoft Start News Feed
+    private lateinit var alohaNewsSection: View
+    private lateinit var pillHot: TextView
+    private lateinit var pillNews: TextView
+    private lateinit var pillEntertainment: TextView
+    private lateinit var pillSports: TextView
+    private lateinit var pillMoney: TextView
+    private lateinit var cardFeaturedNews: View
+
+    // Mobile Bottom Navigation Bar
+    private lateinit var mobileNavBar: View
+    private lateinit var btnNavBack: ImageButton
+    private lateinit var btnNavHome: ImageButton
+    private lateinit var btnNavMenu: ImageButton
+    private lateinit var btnNavDownloads: ImageButton
+    private lateinit var btnNavTabs: ImageButton
+    private lateinit var btnNavSettings: ImageButton
 
     // Error & Retry Screen Views
     private lateinit var errorContainer: View
@@ -92,7 +136,9 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        preferencesManager = PreferencesManager(this)
         openSearchManager = OpenSearchManager(this)
+
         initViews()
         initGeminiPanel()
         initWebView()
@@ -107,11 +153,12 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             }
         }
 
-        // Show Home View initially (Bing / Search Home)
+        // Apply theme, home screen layout & search engine
         returnToHome()
     }
 
     private fun initViews() {
+        rootLayout = findViewById(R.id.rootLayout)
         webView = findViewById(R.id.webView)
         virtualMouseOverlay = findViewById(R.id.virtualMouseOverlay)
         pipManager = FloatingPipManager(this)
@@ -128,13 +175,54 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnMenu = findViewById(R.id.btnMenu)
         progressBar = findViewById(R.id.progressBar)
 
-        // Home View & Center Search
+        // Home View & Layout Containers
         homeView = findViewById(R.id.homeView)
+        edgeArcTvContainer = findViewById(R.id.edgeArcTvContainer)
+        alohaMobileContainer = findViewById(R.id.alohaMobileContainer)
+
+        // TV Layout Views
         etCenterSearch = findViewById(R.id.etCenterSearch)
         btnShortcutBing = findViewById(R.id.btnShortcutBing)
         btnShortcutGoogle = findViewById(R.id.btnShortcutGoogle)
         btnShortcutYoutube = findViewById(R.id.btnShortcutYoutube)
         btnShortcutGemini = findViewById(R.id.btnShortcutGemini)
+
+        // Aloha Mobile Header Views
+        btnAlohaGift = findViewById(R.id.btnAlohaGift)
+        btnAlohaQr = findViewById(R.id.btnAlohaQr)
+        btnAlohaSettings = findViewById(R.id.btnAlohaSettings)
+        btnAlohaShield = findViewById(R.id.btnAlohaShield)
+        tvAlohaShieldCount = findViewById(R.id.tvAlohaShieldCount)
+        etAlohaSearch = findViewById(R.id.etAlohaSearch)
+        btnAlohaAi = findViewById(R.id.btnAlohaAi)
+
+        // Aloha Shortcut Tiles
+        tileGoogle = findViewById(R.id.tileGoogle)
+        tileX = findViewById(R.id.tileX)
+        tileEbay = findViewById(R.id.tileEbay)
+        tileBooking = findViewById(R.id.tileBooking)
+        tileSkyscanner = findViewById(R.id.tileSkyscanner)
+        tileWeather = findViewById(R.id.tileWeather)
+        tileYoutube = findViewById(R.id.tileYoutube)
+        tileAdd = findViewById(R.id.tileAdd)
+
+        // Microsoft Start News Feed
+        alohaNewsSection = findViewById(R.id.alohaNewsSection)
+        pillHot = findViewById(R.id.pillHot)
+        pillNews = findViewById(R.id.pillNews)
+        pillEntertainment = findViewById(R.id.pillEntertainment)
+        pillSports = findViewById(R.id.pillSports)
+        pillMoney = findViewById(R.id.pillMoney)
+        cardFeaturedNews = findViewById(R.id.cardFeaturedNews)
+
+        // Mobile Bottom Navigation Bar
+        mobileNavBar = findViewById(R.id.mobileNavBar)
+        btnNavBack = findViewById(R.id.btnNavBack)
+        btnNavHome = findViewById(R.id.btnNavHome)
+        btnNavMenu = findViewById(R.id.btnNavMenu)
+        btnNavDownloads = findViewById(R.id.btnNavDownloads)
+        btnNavTabs = findViewById(R.id.btnNavTabs)
+        btnNavSettings = findViewById(R.id.btnNavSettings)
 
         // Error Container
         errorContainer = findViewById(R.id.errorContainer)
@@ -142,6 +230,10 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         btnRetry = findViewById(R.id.btnRetry)
         btnErrorHome = findViewById(R.id.btnErrorHome)
 
+        setupListeners()
+    }
+
+    private fun setupListeners() {
         // Navigation button listeners
         btnBack.setOnClickListener {
             safelyRun {
@@ -183,7 +275,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             safelyRun { showTvMenu() }
         }
 
-        // Shortcuts
+        // TV Shortcuts
         btnShortcutBing.setOnClickListener {
             safelyRun { loadUrl(HOME_URL) }
         }
@@ -198,6 +290,81 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
         btnShortcutGemini.setOnClickListener {
             safelyRun { toggleGeminiPanel() }
+        }
+
+        // Aloha Header Buttons
+        btnAlohaGift.setOnClickListener {
+            safelyRun {
+                Toast.makeText(this, "🎁 Helium Browser: Fast, Lightweight & Ad-Free!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnAlohaQr.setOnClickListener {
+            safelyRun {
+                Toast.makeText(this, "📷 QR Scanner feature ready", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnAlohaSettings.setOnClickListener {
+            safelyRun {
+                TvDialogs.showSettingsDialog(this, preferencesManager) {
+                    applyUserPreferences()
+                }
+            }
+        }
+
+        btnAlohaShield.setOnClickListener {
+            safelyRun { onToggleAdBlocker() }
+        }
+
+        btnAlohaAi.setOnClickListener {
+            safelyRun { toggleGeminiPanel() }
+        }
+
+        // Aloha Shortcut Tiles
+        tileGoogle.setOnClickListener { safelyRun { loadUrl(GOOGLE_URL) } }
+        tileX.setOnClickListener { safelyRun { loadUrl("https://x.com") } }
+        tileEbay.setOnClickListener { safelyRun { loadUrl("https://www.ebay.com") } }
+        tileBooking.setOnClickListener { safelyRun { loadUrl("https://www.booking.com") } }
+        tileSkyscanner.setOnClickListener { safelyRun { loadUrl("https://www.skyscanner.net") } }
+        tileWeather.setOnClickListener { safelyRun { loadUrl("https://www.bing.com/weather") } }
+        tileYoutube.setOnClickListener { safelyRun { loadUrl(YOUTUBE_URL) } }
+        tileAdd.setOnClickListener {
+            safelyRun {
+                TvDialogs.showSettingsDialog(this, preferencesManager) {
+                    applyUserPreferences()
+                }
+            }
+        }
+
+        // News Pills & Card
+        pillHot.setOnClickListener { safelyRun { loadUrl("https://www.msn.com") } }
+        pillNews.setOnClickListener { safelyRun { loadUrl("https://www.bing.com/news") } }
+        pillEntertainment.setOnClickListener { safelyRun { loadUrl("https://www.msn.com/en-in/entertainment") } }
+        pillSports.setOnClickListener { safelyRun { loadUrl("https://www.msn.com/en-in/sports") } }
+        pillMoney.setOnClickListener { safelyRun { loadUrl("https://www.msn.com/en-in/money") } }
+        cardFeaturedNews.setOnClickListener { safelyRun { loadUrl("https://www.msn.com") } }
+
+        // Mobile Bottom Navigation Bar
+        btnNavBack.setOnClickListener { safelyRun { onNavigateBack() } }
+        btnNavHome.setOnClickListener { safelyRun { returnToHome() } }
+        btnNavMenu.setOnClickListener { safelyRun { showTvMenu() } }
+        btnNavDownloads.setOnClickListener {
+            safelyRun {
+                Toast.makeText(this, "📥 Downloads: All files stored safely", Toast.LENGTH_SHORT).show()
+            }
+        }
+        btnNavTabs.setOnClickListener {
+            safelyRun {
+                TvDialogs.showTabsDialog(this, 1) { returnToHome() }
+            }
+        }
+        btnNavSettings.setOnClickListener {
+            safelyRun {
+                TvDialogs.showSettingsDialog(this, preferencesManager) {
+                    applyUserPreferences()
+                }
+            }
         }
 
         // Error retry buttons
@@ -226,7 +393,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             }
         }
 
-        // Center Search input listener
+        // Center TV Search input listener
         etCenterSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
                 val input = etCenterSearch.text.toString()
@@ -235,6 +402,48 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             } else {
                 false
             }
+        }
+
+        // Aloha Search input listener
+        etAlohaSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
+                val input = etAlohaSearch.text.toString()
+                loadUrl(processInput(input))
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun applyUserPreferences() {
+        safelyRun {
+            // 1. Set root wallpaper background
+            rootLayout.setBackgroundResource(preferencesManager.theme.drawableRes)
+
+            // 2. Select layout mode
+            if (preferencesManager.isAlohaMobileActive()) {
+                alohaMobileContainer.visibility = View.VISIBLE
+                edgeArcTvContainer.visibility = View.GONE
+                mobileNavBar.visibility = View.VISIBLE
+                virtualMouseOverlay.visibility = View.GONE
+                // On mobile home screen, Aloha header serves as search bar
+                topBar.visibility = if (webView.visibility == View.VISIBLE) View.VISIBLE else View.GONE
+            } else {
+                alohaMobileContainer.visibility = View.GONE
+                edgeArcTvContainer.visibility = View.VISIBLE
+                mobileNavBar.visibility = View.GONE
+                topBar.visibility = View.VISIBLE
+            }
+
+            // 3. News Feed visibility
+            alohaNewsSection.visibility = if (preferencesManager.showNewsFeed) View.VISIBLE else View.GONE
+
+            // 4. Update search hints
+            val engine = preferencesManager.searchEngine
+            etOmnibox.hint = "Search $engine or enter URL"
+            etAlohaSearch.hint = "Search in $engine or enter URL"
+            etCenterSearch.hint = "Search $engine"
         }
     }
 
@@ -265,6 +474,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                         errorContainer.visibility = View.GONE
                         homeView.visibility = View.GONE
                         webView.visibility = View.VISIBLE
+                        topBar.visibility = View.VISIBLE
                     }
                 },
                 onPageFinished = { url ->
@@ -280,6 +490,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                         progressBar.visibility = View.GONE
                         webView.visibility = View.GONE
                         homeView.visibility = View.GONE
+                        topBar.visibility = View.VISIBLE
                         errorContainer.visibility = View.VISIBLE
                         tvErrorMessage.text = "Failed to load: $failingUrl\n($description)"
                     }
@@ -289,6 +500,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                         if (count > 0) {
                             tvShieldCount.visibility = View.VISIBLE
                             tvShieldCount.text = "$count"
+                            tvAlohaShieldCount.visibility = View.VISIBLE
+                            tvAlohaShieldCount.text = "$count"
                         }
                     }
                 }
@@ -312,8 +525,12 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                     // Fullscreen video toggle
                     if (customView != null) {
                         topBar.visibility = View.GONE
+                        mobileNavBar.visibility = View.GONE
                     } else {
                         topBar.visibility = View.VISIBLE
+                        if (preferencesManager.isAlohaMobileActive()) {
+                            mobileNavBar.visibility = View.VISIBLE
+                        }
                     }
                 }
             )
@@ -396,7 +613,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
      * Bing Search & URL Logic specified by User:
      * - Trims extra spaces.
      * - If starts with http:// or https:// or looks like a valid domain: loads URL directly (adding https:// if missing).
-     * - Otherwise: treats as search query, URL-encodes it properly, and loads: https://www.bing.com/search?q={query}.
+     * - Otherwise: treats as search query, URL-encodes it properly, and loads search engine.
      */
     fun processInput(rawInput: String): String {
         val text = rawInput.trim()
@@ -413,9 +630,13 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             return "https://$text"
         }
 
-        // Treat as search query: properly URL-encode text and load Bing
+        // Search query using configured engine (Default: Bing)
         val encoded = Uri.encode(text)
-        return "https://www.bing.com/search?q=$encoded"
+        return when (preferencesManager.searchEngine.lowercase()) {
+            "google" -> "https://www.google.com/search?q=$encoded"
+            "duckduckgo" -> "https://duckduckgo.com/?q=$encoded"
+            else -> "https://www.bing.com/search?q=$encoded"
+        }
     }
 
     fun loadUrl(url: String) {
@@ -427,6 +648,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         errorContainer.visibility = View.GONE
         homeView.visibility = View.GONE
         webView.visibility = View.VISIBLE
+        topBar.visibility = View.VISIBLE
 
         safelyRun {
             webView.loadUrl(url)
@@ -441,6 +663,9 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         currentPageUrl = ""
         etOmnibox.setText("")
         etCenterSearch.setText("")
+        etAlohaSearch.setText("")
+
+        applyUserPreferences()
     }
 
     private fun showTvMenu() {
@@ -451,7 +676,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             onUserAgentClick = { cycleUserAgent() },
             onSearchEngineClick = {
                 TvDialogs.showSearchEngineDialog(this, openSearchManager) { selected ->
-                    etOmnibox.hint = "Search ${selected.shortName} or type URL"
+                    preferencesManager.searchEngine = selected.shortName
+                    applyUserPreferences()
                 }
             },
             onPipClick = { onTogglePipMode() },
@@ -462,6 +688,11 @@ class MainActivity : AppCompatActivity(), TvActionListener {
                     webView.clearHistory()
                     android.webkit.CookieManager.getInstance().removeAllCookies(null)
                     Toast.makeText(this, "Cache & Cookies cleared!", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onSettingsClick = {
+                TvDialogs.showSettingsDialog(this, preferencesManager) {
+                    applyUserPreferences()
                 }
             }
         )
@@ -512,7 +743,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     override fun onOpenExtensionManager() {
-        // Not used right now as per user instruction: "not use heavy features right now"
         Toast.makeText(this, "Core Browser Mode Active", Toast.LENGTH_SHORT).show()
     }
 
@@ -559,10 +789,14 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         pipManager.onPictureInPictureModeChanged(isInPictureInPictureMode)
         if (isInPictureInPictureMode) {
             topBar.visibility = View.GONE
+            mobileNavBar.visibility = View.GONE
             virtualMouseOverlay.visibility = View.GONE
             geminiPanel.visibility = View.GONE
         } else {
             topBar.visibility = View.VISIBLE
+            if (preferencesManager.isAlohaMobileActive()) {
+                mobileNavBar.visibility = View.VISIBLE
+            }
         }
     }
 

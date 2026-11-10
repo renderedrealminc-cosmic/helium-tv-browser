@@ -11,11 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="54dp"
+        android:layout_marginBottom="0dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:visibility="gone" />
 
-    <!-- Top Chromium Omnibox Bar (Edge / Chromium Style from Screenshot) -->
+    <!-- Top Chromium Omnibox Bar (Edge / Chromium Style for TV and Web Browsing) -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -167,145 +168,807 @@
         android:progressDrawable="@android:drawable/progress_horizontal"
         android:visibility="gone" />
 
-    <!-- Modern Pastel / Liquid Bubble Home Screen (Matches Uploaded Screenshot) -->
+    <!-- Unified Home Screen Container -->
     <FrameLayout
         android:id="@+id/homeView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="54dp"
-        android:background="@drawable/bg_liquid_wallpaper">
+        android:layout_height="match_parent">
 
-        <!-- Center Glowing Logo / Liquid Orb Aesthetic -->
-        <ImageView
-            android:id="@+id/ivCenterLiquidOrb"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:layout_gravity="center"
-            android:alpha="0.85"
-            android:contentDescription="Liquid Orb"
-            android:scaleType="centerCrop"
-            android:src="@drawable/helium_logo" />
-
-        <!-- Main Home Vertical Content -->
-        <LinearLayout
+        <!-- ======================================================== -->
+        <!-- 1. TV Edge / Arc Layout (Matches User TV Screenshot)    -->
+        <!-- ======================================================== -->
+        <FrameLayout
+            android:id="@+id/edgeArcTvContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp">
+            android:layout_marginTop="54dp"
+            android:visibility="gone">
 
-            <!-- Center Prominent Search Stadium Pill -->
+            <!-- Center Glowing Logo / Liquid Orb Aesthetic -->
+            <ImageView
+                android:id="@+id/ivCenterLiquidOrb"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_gravity="center"
+                android:alpha="0.85"
+                android:contentDescription="Liquid Orb"
+                android:scaleType="centerCrop"
+                android:src="@drawable/helium_logo" />
+
+            <!-- Main TV Home Vertical Content -->
             <LinearLayout
-                android:id="@+id/centerSearchContainer"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:maxWidth="520dp"
-                android:background="@drawable/bg_center_search"
-                android:elevation="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp">
 
-                <ImageView
-                    android:id="@+id/ivCenterSearchLogo"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="12dp"
-                    android:contentDescription="Search Provider"
-                    android:src="@drawable/ic_google_g" />
-
-                <EditText
-                    android:id="@+id/etCenterSearch"
+                <!-- Center Prominent Search Stadium Pill -->
+                <LinearLayout
+                    android:id="@+id/centerSearchContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@null"
-                    android:hint="Search the web"
-                    android:imeOptions="actionSearch"
-                    android:inputType="textUri"
-                    android:singleLine="true"
-                    android:textColor="#0F172A"
-                    android:textColorHint="#64748B"
-                    android:textCursorDrawable="@null"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:layout_height="52dp"
+                    android:maxWidth="520dp"
+                    android:background="@drawable/bg_center_search"
+                    android:elevation="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivCenterSearchLogo"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="Search Provider"
+                        android:src="@drawable/ic_google_g" />
+
+                    <EditText
+                        android:id="@+id/etCenterSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="Search the web"
+                        android:imeOptions="actionSearch"
+                        android:inputType="textUri"
+                        android:singleLine="true"
+                        android:textColor="#0F172A"
+                        android:textColorHint="#64748B"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Quick Speed Dial Circular Icons -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!-- Bing Shortcut -->
+                    <ImageButton
+                        android:id="@+id/btnShortcutBing"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_circle_button"
+                        android:contentDescription="Bing"
+                        android:elevation="3dp"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/helium_logo" />
+
+                    <!-- Google Shortcut -->
+                    <ImageButton
+                        android:id="@+id/btnShortcutGoogle"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_circle_button"
+                        android:contentDescription="Google"
+                        android:elevation="3dp"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_google_g" />
+
+                    <!-- YouTube Shortcut -->
+                    <ImageButton
+                        android:id="@+id/btnShortcutYoutube"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_circle_button"
+                        android:contentDescription="YouTube"
+                        android:elevation="3dp"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_youtube" />
+
+                    <!-- Gemini AI Shortcut -->
+                    <ImageButton
+                        android:id="@+id/btnShortcutGemini"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/bg_circle_button"
+                        android:contentDescription="Gemini AI"
+                        android:elevation="3dp"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_gemini_sparkle" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <!-- Quick Speed Dial Circular Icons (Matches Screenshot) -->
-            <LinearLayout
+            <!-- Bottom Inspirational Quote -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="24dp"
+                android:text="You can't stop the waves, but you can learn to surf"
+                android:textColor="#594E6A"
+                android:textSize="13sp"
+                android:textStyle="italic|bold" />
+        </FrameLayout>
 
-                <!-- Bing Shortcut -->
-                <ImageButton
-                    android:id="@+id/btnShortcutBing"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/bg_circle_button"
-                    android:contentDescription="Bing"
-                    android:elevation="3dp"
-                    android:focusable="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/helium_logo" />
+        <!-- ======================================================== -->
+        <!-- 2. Mobile Aloha Layout (Matches User Aloha Screenshot)   -->
+        <!-- ======================================================== -->
+        <LinearLayout
+            android:id="@+id/alohaMobileContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-                <!-- Google Shortcut -->
-                <ImageButton
-                    android:id="@+id/btnShortcutGoogle"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/bg_circle_button"
-                    android:contentDescription="Google"
-                    android:elevation="3dp"
-                    android:focusable="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_google_g" />
+            <!-- Aloha Sky Blue Curved Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_aloha_header"
+                android:elevation="6dp"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="18dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="18dp">
 
-                <!-- YouTube Shortcut -->
-                <ImageButton
-                    android:id="@+id/btnShortcutYoutube"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/bg_circle_button"
-                    android:contentDescription="YouTube"
-                    android:elevation="3dp"
-                    android:focusable="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_youtube" />
+                <!-- Top Branding Row: Helium Browser + Icons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <!-- Gemini AI Shortcut -->
-                <ImageButton
-                    android:id="@+id/btnShortcutGemini"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/bg_circle_button"
-                    android:contentDescription="Gemini AI"
-                    android:elevation="3dp"
-                    android:focusable="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_gemini_sparkle" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Helium Logo"
+                        android:src="@drawable/helium_logo" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Helium"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <!-- Aloha Gift Icon -->
+                    <ImageButton
+                        android:id="@+id/btnAlohaGift"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:contentDescription="Gift Rewards"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_gift" />
+
+                    <!-- Aloha QR Scanner Icon -->
+                    <ImageButton
+                        android:id="@+id/btnAlohaQr"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:contentDescription="QR Code"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_qr_code" />
+
+                    <!-- Aloha Settings Gear Icon -->
+                    <ImageButton
+                        android:id="@+id/btnAlohaSettings"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:contentDescription="Settings"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_settings" />
+                </LinearLayout>
+
+                <!-- Aloha Dark Capsule Search Bar -->
+                <LinearLayout
+                    android:id="@+id/alohaSearchContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_aloha_search"
+                    android:elevation="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="6dp">
+
+                    <!-- Shield Counter Frame -->
+                    <FrameLayout
+                        android:id="@+id/btnAlohaShield"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_shield" />
+
+                        <TextView
+                            android:id="@+id/tvAlohaShieldCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="#EF4444"
+                            android:paddingStart="3dp"
+                            android:paddingEnd="3dp"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+                    </FrameLayout>
+
+                    <!-- Search Engine Provider Icon -->
+                    <ImageView
+                        android:id="@+id/ivAlohaEngineLogo"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_google_g" />
+
+                    <!-- Aloha Search Text Input -->
+                    <EditText
+                        android:id="@+id/etAlohaSearch"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Search in Google or Bing"
+                        android:imeOptions="actionSearch"
+                        android:inputType="textUri"
+                        android:singleLine="true"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#94A3B8"
+                        android:textCursorDrawable="@null"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- Aloha AI Sparkle Pill Button -->
+                    <LinearLayout
+                        android:id="@+id/btnAlohaAi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_ai_pill"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✨ AI"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
-        </LinearLayout>
+            <!-- Scrollable Body: Shortcuts & Microsoft Start News Feed -->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="58dp">
 
-        <!-- Bottom Inspirational Quote (Exact quote from screenshot) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="24dp"
-            android:text="You can't stop the waves, but you can learn to surf"
-            android:textColor="#594E6A"
-            android:textSize="13sp"
-            android:textStyle="italic|bold" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Shortcuts Grid Row 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="4">
+
+                        <!-- Google Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileGoogle"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_google_g" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Google"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- X / Twitter Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileX"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="𝕏"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="X"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- eBay Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileEbay"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ebay"
+                                android:textColor="#38BDF8"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="eBay"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- Booking Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileBooking"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="B."
+                                android:textColor="#60A5FA"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Booking"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Shortcuts Grid Row 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:orientation="horizontal"
+                        android:weightSum="4">
+
+                        <!-- Skyscanner Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileSkyscanner"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_search" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:text="SkyScan"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- Weather Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileWeather"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_weather" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Weather"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- YouTube Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileYoutube"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_youtube" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="YouTube"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <!-- Add / Settings Tile -->
+                        <LinearLayout
+                            android:id="@+id/tileAdd"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_square_tile"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_add" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Add"
+                                android:textColor="#E2E8F0"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- News Section Powered by Microsoft Start -->
+                    <LinearLayout
+                        android:id="@+id/alohaNewsSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="News powered by Microsoft Start"
+                            android:textColor="#94A3B8"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <!-- Category Horizontal Scroll Pills -->
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:scrollbars="none">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/pillHot"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/bg_pill_category"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:text="🔥 Hot"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/pillNews"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/bg_pill_category"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:text="📰 News"
+                                    android:textColor="#CBD5E1"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/pillEntertainment"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/bg_pill_category"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:text="🎬 Entertainment"
+                                    android:textColor="#CBD5E1"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/pillSports"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/bg_pill_category"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:text="⚽ Sports"
+                                    android:textColor="#CBD5E1"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/pillMoney"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="32dp"
+                                    android:background="@drawable/bg_pill_category"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:text="💰 Money"
+                                    android:textColor="#CBD5E1"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </HorizontalScrollView>
+
+                        <!-- Featured News Card -->
+                        <LinearLayout
+                            android:id="@+id/cardFeaturedNews"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_news_card"
+                            android:clickable="true"
+                            android:elevation="3dp"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Microsoft Start • Top Stories"
+                                android:textColor="#38BDF8"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Trending Headlines, Live Sports Updates and Daily Insights"
+                                android:textColor="#F1F5F9"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Tap to browse the latest breaking stories, cricket scores, and personalized updates curated for you."
+                                android:textColor="#94A3B8"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
+
+        </LinearLayout>
     </FrameLayout>
+
+    <!-- Mobile Bottom Navigation Bar (Aloha Style for Phones) -->
+    <LinearLayout
+        android:id="@+id/mobileNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_gravity="bottom"
+        android:background="#101726"
+        android:elevation="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageButton
+            android:id="@+id/btnNavBack"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Back"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_back" />
+
+        <ImageButton
+            android:id="@+id/btnNavHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Home"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_home" />
+
+        <ImageButton
+            android:id="@+id/btnNavMenu"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Menu"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_menu_burger" />
+
+        <ImageButton
+            android:id="@+id/btnNavDownloads"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Downloads"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_download" />
+
+        <ImageButton
+            android:id="@+id/btnNavTabs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Tabs"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_tabs" />
+
+        <ImageButton
+            android:id="@+id/btnNavSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Settings"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_settings" />
+    </LinearLayout>
 
     <!-- Clean Error & Retry Screen (No More Crashes!) -->
     <LinearLayout
