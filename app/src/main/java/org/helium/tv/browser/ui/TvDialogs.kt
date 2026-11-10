@@ -15,8 +15,94 @@ import kotlinx.coroutines.withContext
 import org.helium.tv.browser.R
 import org.helium.tv.browser.engine.ExtensionItem
 import org.helium.tv.browser.engine.ExtensionManager
+import org.helium.tv.browser.search.OpenSearchManager
+import org.helium.tv.browser.search.SearchEngine
 
 object TvDialogs {
+
+    fun showMenuDialog(
+        context: Context,
+        onGeminiClick: () -> Unit,
+        onExtensionsClick: () -> Unit,
+        onPointerToggle: () -> Unit,
+        onUserAgentClick: () -> Unit,
+        onSearchEngineClick: () -> Unit,
+        onPipClick: () -> Unit,
+        onReloadClick: () -> Unit,
+        onClearDataClick: () -> Unit
+    ) {
+        val options = arrayOf(
+            "✨ Gemini AI Assistant",
+            "🧩 Extensions & Add-ons (.xpi)",
+            "🎯 Toggle Neon Mouse Pointer",
+            "🖥️ Switch User-Agent (TV / Desktop / Mobile)",
+            "🔍 Search Engine (OpenSearch XML)",
+            "🪟 Picture-in-Picture Mode",
+            "🔄 Reload Page",
+            "🗑️ Clear Cache & Cookies"
+        )
+
+        AlertDialog.Builder(context)
+            .setTitle("⚙️ Helium TV - Options")
+            .setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> onGeminiClick()
+                    1 -> onExtensionsClick()
+                    2 -> onPointerToggle()
+                    3 -> onUserAgentClick()
+                    4 -> onSearchEngineClick()
+                    5 -> onPipClick()
+                    6 -> onReloadClick()
+                    7 -> onClearDataClick()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    fun showSearchEngineDialog(
+        context: Context,
+        searchManager: OpenSearchManager,
+        onEngineSelected: (SearchEngine) -> Unit
+    ) {
+        val engines = searchManager.getAvailableEngines()
+        val names = engines.map { "${it.shortName} (${it.description})" }.toTypedArray()
+
+        AlertDialog.Builder(context)
+            .setTitle("🔍 Select OpenSearch Engine")
+            .setItems(names) { dialog, which ->
+                val selected = engines[which]
+                searchManager.activeEngine = selected
+                onEngineSelected(selected)
+                Toast.makeText(context, "Search Engine: ${selected.shortName}", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    fun showTabsDialog(
+        context: Context,
+        tabCount: Int,
+        onNewTab: () -> Unit
+    ) {
+        val items = arrayOf(
+            "Active Tab 1 (Current Session)",
+            "➕ Open New Blank Tab"
+        )
+
+        AlertDialog.Builder(context)
+            .setTitle("📑 Tabs Manager ($tabCount open)")
+            .setItems(items) { dialog, which ->
+                if (which == 1) {
+                    onNewTab()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Close", null)
+            .show()
+    }
 
     fun showExtensionManagerDialog(
         context: Context,

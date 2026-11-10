@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com">
+  <ShortName>Google</ShortName>
+  <Description>Search with Google</Description>
+  <Url type="text/html" template="https://www.google.com/search?q={searchTerms}"/>
+</OpenSearchDescription>

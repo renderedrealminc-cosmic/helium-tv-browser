@@ -45,11 +45,23 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Optimized TV APKs with Gradle (<50MB)
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleRelease --stacktrace
 
-      - name: Upload APKs to GitHub Artifacts
+      - name: Inspect Built APK Sizes
+        run: |
+          echo "=== Built APK List & Sizes ==="
+          ls -lh app/build/outputs/apk/release/*.apk
+
+      - name: Upload ARM64 TV APK (Modern Android TVs & FireTV)
         uses: actions/upload-artifact@v4
         with:
-          name: HeliumTV-Browser-Optimized-APKs
-          path: app/build/outputs/apk/debug/*.apk
+          name: HeliumTV-arm64-v8a
+          path: app/build/outputs/apk/release/*arm64-v8a*.apk
+          retention-days: 14
+
+      - name: Upload ARMv7 TV APK (32-bit Android TVs & FireTV Sticks)
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeliumTV-armeabi-v7a
+          path: app/build/outputs/apk/release/*armeabi-v7a*.apk
           retention-days: 14

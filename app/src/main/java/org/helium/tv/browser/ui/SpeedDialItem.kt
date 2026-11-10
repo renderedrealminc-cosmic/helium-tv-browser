@@ -1,20 +1,52 @@
 package org.helium.tv.browser.ui
 
+import org.helium.tv.browser.R
+
 data class SpeedDialItem(
     val title: String,
     val url: String,
-    val category: String,
-    val emoji: String = "🌐"
+    val iconResId: Int? = null,
+    val letter: String? = null,
+    val displayUrl: String = url,
+    val isPinned: Boolean = true
 )
 
 object DefaultBookmarks {
     val ITEMS = listOf(
-        SpeedDialItem("Microsoft Bing", "https://www.bing.com", "Search Engine", "🔍"),
-        SpeedDialItem("YouTube TV", "https://tv.youtube.com", "4K Video", "📺"),
-        SpeedDialItem("YouTube Web", "https://www.youtube.com", "Video & Music", "▶️"),
-        SpeedDialItem("Twitch TV", "https://www.twitch.tv", "Live Streams", "🎮"),
-        SpeedDialItem("Reddit", "https://www.reddit.com", "Community", "💬"),
-        SpeedDialItem("Wikipedia", "https://www.wikipedia.org", "Knowledge", "📚"),
-        SpeedDialItem("Firefox Add-ons", "https://addons.mozilla.org/firefox/extensions/", "Web Extensions", "🧩")
+        SpeedDialItem(
+            title = "YouTube",
+            url = "https://www.youtube.com",
+            iconResId = R.drawable.ic_youtube,
+            displayUrl = "https://w...",
+            isPinned = true
+        ),
+        SpeedDialItem(
+            title = "Gemini",
+            url = "https://gemini.google.com",
+            iconResId = R.drawable.ic_gemini_sparkle,
+            displayUrl = "https://ge...",
+            isPinned = true
+        ),
+        SpeedDialItem(
+            title = "Search",
+            url = "https://www.google.com",
+            letter = "S",
+            displayUrl = "https://w...",
+            isPinned = true
+        ),
+        SpeedDialItem(
+            title = "Tools",
+            url = "https://zs.org",
+            letter = "Z",
+            displayUrl = "https://zs...",
+            isPinned = true
+        ),
+        SpeedDialItem(
+            title = "App Downloads",
+            url = "https://addons.mozilla.org/firefox/extensions/",
+            letter = "📦",
+            displayUrl = "App d...",
+            isPinned = false
+        )
     )
 }

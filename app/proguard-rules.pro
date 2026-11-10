@@ -3,7 +3,14 @@
 # Keep GeckoView internal and external bindings
 -keep class org.mozilla.geckoview.** { *; }
 -keep interface org.mozilla.geckoview.** { *; }
+-keep class org.mozilla.gecko.** { *; }
+-keep interface org.mozilla.gecko.** { *; }
 -dontwarn org.mozilla.geckoview.**
+-dontwarn org.mozilla.gecko.**
+
+# Keep Helium Browser package & data models
+-keep class org.helium.tv.browser.** { *; }
+-keepclassmembers class org.helium.tv.browser.** { *; }
 
 # Keep Native JNI methods for Rust AdBlocker and C++ Native Core
 -keepclasseswithmembernames class * {
@@ -24,3 +31,5 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+-dontwarn kotlin.**
+-dontwarn kotlinx.**

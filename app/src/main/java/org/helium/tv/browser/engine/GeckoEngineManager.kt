@@ -9,6 +9,7 @@ import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoRuntimeSettings
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSessionSettings
+import org.mozilla.geckoview.StorageController
 
 class GeckoEngineManager(
     private val context: Context,
@@ -55,6 +56,14 @@ class GeckoEngineManager(
         val ua = UserAgentUtils.getUserAgent(mode)
         session.settings.userAgentOverride = ua
         Log.i(TAG, "Switched UserAgent to: $mode -> $ua")
+    }
+
+    fun clearBrowsingData() {
+        try {
+            runtime.storageController.clearData(StorageController.ClearFlags.ALL)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed clearing browsing data", e)
+        }
     }
 
     fun getRuntimeExtensions(): ExtensionManager {

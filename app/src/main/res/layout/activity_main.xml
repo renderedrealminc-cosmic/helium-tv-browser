@@ -4,9 +4,9 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_oled_black">
+    android:background="@color/bg_home_light">
 
-    <!-- Mozilla GeckoView Engine Surface -->
+    <!-- Mozilla GeckoView Engine Surface (Browsing Layer) -->
     <org.mozilla.geckoview.GeckoView
         android:id="@+id/geckoView"
         android:layout_width="match_parent"
@@ -14,91 +14,327 @@
         android:focusable="true"
         android:focusableInTouchMode="true" />
 
-    <!-- Modern Apple TV / FireTV Style Glassmorphic Home Screen -->
+    <!-- Modern Minimalist Home Screen (Matching Screenshot) -->
     <LinearLayout
-        android:id="@+id/speedDialContainer"
+        android:id="@+id/homeScreenContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#EE08090C"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="28dp">
+        android:background="@color/bg_home_light"
+        android:orientation="vertical">
 
+        <!-- Top App Bar in Home Screen -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎈 Helium TV"
-                android:textColor="@color/text_high_contrast"
-                android:textSize="38sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-                android:background="@drawable/bg_gemini_button"
-                android:paddingStart="12dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="4dp"
-                android:text="✨ Gemini AI"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Liquid Glass UI • Microsoft Bing Engine • Rust Adblocker • 4K Web"
-            android:textColor="@color/text_muted_glass"
-            android:textSize="15sp" />
-
-        <!-- Holographic Apple TV Style Speed Dial Cards -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/speedDialRecyclerView"
+            android:id="@+id/homeTopBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:clipToPadding="false"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp" />
-
-        <!-- TV Remote Shortcuts Hint Bar -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:background="@drawable/bg_liquid_glass_pill"
+            android:layout_height="64dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="8dp">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
+
+            <!-- Home Button -->
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icon_button"
+                android:contentDescription="Home"
+                android:focusable="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_home" />
+
+            <!-- App Logo Badge -->
+            <ImageView
+                android:id="@+id/ivHeaderLogo"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="12dp"
+                android:contentDescription="Helium Logo"
+                android:scaleType="centerCrop"
+                android:src="@drawable/helium_logo" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- AdBlock Shield -->
+            <FrameLayout
+                android:id="@+id/btnShieldLayout"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_icon_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/btnShield"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Adblock Shield"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_shield" />
+
+                <TextView
+                    android:id="@+id/tvShieldCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:background="#EA4335"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:text="0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- Tab Counter Box (Square Badge e.g. '8') -->
+            <FrameLayout
+                android:id="@+id/btnTabs"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_tab_box"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tvTabCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="8"
+                    android:textColor="#1F1F1F"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <!-- 3-Dots Menu Button -->
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icon_button"
+                android:contentDescription="Menu"
+                android:focusable="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_more_vert" />
+        </LinearLayout>
+
+        <!-- Centered Home Content Scrollable -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingTop="32dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="32dp">
+
+                <!-- Prominent Stadium Pill Search Bar -->
+                <LinearLayout
+                    android:id="@+id/searchPillContainer"
+                    android:layout_width="560dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_search_pill"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:id="@+id/ivSearchEngineLogo"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:contentDescription="Search Logo"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_google_g" />
+
+                    <EditText
+                        android:id="@+id/etHomeSearch"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Search Google or type URL"
+                        android:imeOptions="actionSearch"
+                        android:inputType="textUri"
+                        android:singleLine="true"
+                        android:textColor="@color/text_search_input"
+                        android:textColorHint="@color/text_search_hint"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnVoiceSearch"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:contentDescription="Voice Search"
+                        android:focusable="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_mic" />
+                </LinearLayout>
+
+                <!-- White Card Container for Speed Dial Shortcuts -->
+                <FrameLayout
+                    android:id="@+id/shortcutsCardContainer"
+                    android:layout_width="560dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:background="@drawable/bg_card_white"
+                    android:elevation="3dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="18dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/speedDialRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal" />
+                </FrameLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- Web Browsing Top Bar (Active when browsing a website) -->
+    <LinearLayout
+        android:id="@+id/browserTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_gravity="top"
+        android:background="#F8FFFFFF"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone">
+
+        <!-- Home Button to Return to Home Screen -->
+        <ImageButton
+            android:id="@+id/btnBrowserHome"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_icon_button"
+            android:contentDescription="Return Home"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_home" />
+
+        <!-- Address / Search Pill in Browser Bar -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_pill"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="12dp">
+
+            <EditText
+                android:id="@+id/etBrowserUrl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Search Google or type URL"
+                android:imeOptions="actionGo"
+                android:inputType="textUri"
+                android:singleLine="true"
+                android:textColor="@color/text_search_input"
+                android:textColorHint="@color/text_search_hint"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Shield Button -->
+        <FrameLayout
+            android:id="@+id/btnBrowserShieldLayout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_icon_button"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/btnBrowserShield"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_shield" />
+        </FrameLayout>
+
+        <!-- Tabs Button -->
+        <FrameLayout
+            android:id="@+id/btnBrowserTabs"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_tab_box"
+            android:clickable="true"
+            android:focusable="true">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎮 Remote Shortcuts: [RED] Extensions • [GREEN] Neon Pointer • [YELLOW] Adblock • [BLUE] PiP • [MENU] Bar"
-                android:textColor="@color/liquid_cyan"
-                android:textSize="13sp" />
-        </LinearLayout>
+                android:id="@+id/tvBrowserTabCount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="8"
+                android:textColor="#1F1F1F"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- 3-Dots Menu Button -->
+        <ImageButton
+            android:id="@+id/btnBrowserMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_icon_button"
+            android:contentDescription="Menu"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_more_vert" />
     </LinearLayout>
+
+    <!-- Page Loading Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="58dp"
+        android:elevation="9dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:visibility="gone" />
 
     <!-- Gemini AI Assistant Overlay Panel (Slide-in) -->
     <LinearLayout
         android:id="@+id/geminiPanel"
-        android:layout_width="480dp"
+        android:layout_width="460dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="#F010141E"
+        android:background="#FDFDFE"
         android:elevation="16dp"
         android:orientation="vertical"
         android:padding="24dp"
@@ -110,39 +346,45 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_gemini_sparkle" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="✨ Gemini AI Assistant"
-                android:textColor="@color/neon_purple"
-                android:textSize="20sp"
+                android:text="Gemini AI Assistant"
+                android:textColor="#1F1F1F"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnCloseGemini"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_liquid_button"
+                android:background="@drawable/bg_search_pill"
                 android:text="✕ Close"
-                android:textColor="#FFFFFF"
+                android:textColor="#1F1F1F"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <EditText
             android:id="@+id/etGeminiPrompt"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="46dp"
             android:layout_marginTop="16dp"
-            android:background="@drawable/bg_liquid_button"
+            android:background="@drawable/bg_search_pill"
             android:hint="Ask Gemini anything or summarize page..."
             android:imeOptions="actionSend"
             android:inputType="text"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textColorHint="@color/text_muted_glass"
+            android:textColor="#1F1F1F"
+            android:textColorHint="#5F6368"
             android:textSize="13sp" />
 
         <LinearLayout
@@ -157,9 +399,9 @@
                 android:layout_height="38dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_liquid_button"
+                android:background="@drawable/bg_search_pill"
                 android:text="📄 Summarize Page"
-                android:textColor="@color/liquid_cyan"
+                android:textColor="#1A73E8"
                 android:textSize="11sp" />
 
             <Button
@@ -167,9 +409,9 @@
                 android:layout_width="0dp"
                 android:layout_height="38dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_liquid_button"
+                android:background="@drawable/bg_search_pill"
                 android:text="🌐 Hindi Me Samjhao"
-                android:textColor="@color/neon_purple"
+                android:textColor="#8430CE"
                 android:textSize="11sp" />
         </LinearLayout>
 
@@ -184,8 +426,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="4dp"
-                android:text="Gemini AI ready to help! Ask any question or click Summarize Page above."
-                android:textColor="@color/text_high_contrast"
+                android:text="✨ Gemini AI ready to help! Ask any question or click Summarize Page above."
+                android:textColor="#1F1F1F"
                 android:textSize="14sp" />
         </ScrollView>
     </LinearLayout>
@@ -195,121 +437,5 @@
         android:id="@+id/virtualMouseOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <!-- Floating Liquid Glass Pill Navigation Bar -->
-    <FrameLayout
-        android:id="@+id/toolbarContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:elevation="14dp"
-        android:padding="12dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_liquid_glass_pill"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
-
-            <EditText
-                android:id="@+id/urlEditText"
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:background="#25FFFFFF"
-                android:hint="🔍 Search with Microsoft Bing or enter URL..."
-                android:imeOptions="actionGo"
-                android:inputType="textUri"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:singleLine="true"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#90FFFFFF"
-                android:textSize="14sp" />
-
-            <Button
-                android:id="@+id/btnGeminiAi"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_gemini_button"
-                android:focusable="true"
-                android:text="✨ Gemini"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnMouseToggle"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_liquid_button"
-                android:focusable="true"
-                android:text="🎯 Pointer: ON"
-                android:textColor="@color/liquid_cyan"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnAdblockStats"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_liquid_button"
-                android:focusable="true"
-                android:text="🛡️ 0"
-                android:textColor="@color/neon_coral"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnExtensions"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_liquid_button"
-                android:focusable="true"
-                android:text="🧩 Add-ons"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnUserAgent"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_liquid_button"
-                android:focusable="true"
-                android:text="UA: TV"
-                android:textColor="@color/text_muted_glass"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnOpacity"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_liquid_button"
-                android:focusable="true"
-                android:text="Alpha: 100%"
-                android:textColor="@color/text_muted_glass"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:indeterminate="false"
-            android:max="100"
-            android:progressDrawable="@android:drawable/progress_horizontal"
-            android:visibility="gone" />
-    </FrameLayout>
 
 </FrameLayout>

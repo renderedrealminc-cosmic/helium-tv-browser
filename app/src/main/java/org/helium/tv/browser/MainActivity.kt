@@ -1,12 +1,16 @@
 package org.helium.tv.browser
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +29,7 @@ import org.helium.tv.browser.input.TvActionListener
 import org.helium.tv.browser.input.TvKeyHandler
 import org.helium.tv.browser.input.VirtualMouseOverlay
 import org.helium.tv.browser.pip.FloatingPipManager
+import org.helium.tv.browser.search.OpenSearchManager
 import org.helium.tv.browser.ui.DefaultBookmarks
 import org.helium.tv.browser.ui.TvDialogs
 import org.helium.tv.browser.ui.TvSpeedDialAdapter
@@ -41,19 +46,30 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private lateinit var tvKeyHandler: TvKeyHandler
     private lateinit var pipManager: FloatingPipManager
     private lateinit var filterManager: FilterListManager
+    private lateinit var openSearchManager: OpenSearchManager
 
-    // UI elements
-    private lateinit var toolbarContainer: View
-    private lateinit var urlEditText: EditText
-    private lateinit var progressBar: ProgressBar
-    private lateinit var btnMouseToggle: Button
-    private lateinit var btnExtensions: Button
-    private lateinit var btnAdblockStats: Button
-    private lateinit var btnUserAgent: Button
-    private lateinit var btnOpacity: Button
-    private lateinit var btnGeminiAi: Button
+    // Home Screen Views (Light Minimalist Material 3 Theme)
+    private lateinit var homeScreenContainer: View
+    private lateinit var btnHome: ImageButton
+    private lateinit var ivHeaderLogo: ImageView
+    private lateinit var btnShieldLayout: View
+    private lateinit var tvShieldCount: TextView
+    private lateinit var btnTabs: View
+    private lateinit var tvTabCount: TextView
+    private lateinit var btnMenu: ImageButton
+    private lateinit var etHomeSearch: EditText
+    private lateinit var btnVoiceSearch: ImageButton
     private lateinit var speedDialRecyclerView: RecyclerView
-    private lateinit var speedDialContainer: View
+
+    // Web Browsing Top Bar (Active when web page is loaded)
+    private lateinit var browserTopBar: View
+    private lateinit var btnBrowserHome: ImageButton
+    private lateinit var etBrowserUrl: EditText
+    private lateinit var btnBrowserShieldLayout: View
+    private lateinit var btnBrowserTabs: View
+    private lateinit var tvBrowserTabCount: TextView
+    private lateinit var btnBrowserMenu: ImageButton
+    private lateinit var progressBar: ProgressBar
 
     // Gemini AI Panel
     private lateinit var geminiPanel: View
@@ -71,6 +87,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        openSearchManager = OpenSearchManager(this)
         initViews()
         initGeminiPanel()
         initBrowserEngine()
@@ -86,39 +103,70 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     private fun initViews() {
         geckoView = findViewById(R.id.geckoView)
         virtualMouseOverlay = findViewById(R.id.virtualMouseOverlay)
-        toolbarContainer = findViewById(R.id.toolbarContainer)
-        urlEditText = findViewById(R.id.urlEditText)
-        progressBar = findViewById(R.id.progressBar)
-        btnMouseToggle = findViewById(R.id.btnMouseToggle)
-        btnExtensions = findViewById(R.id.btnExtensions)
-        btnAdblockStats = findViewById(R.id.btnAdblockStats)
-        btnUserAgent = findViewById(R.id.btnUserAgent)
-        btnOpacity = findViewById(R.id.btnOpacity)
-        btnGeminiAi = findViewById(R.id.btnGeminiAi)
-        speedDialRecyclerView = findViewById(R.id.speedDialRecyclerView)
-        speedDialContainer = findViewById(R.id.speedDialContainer)
-
         pipManager = FloatingPipManager(this)
 
-        urlEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
-                val input = urlEditText.text.toString().trim()
-                loadUrl(input)
+        // Home screen container & elements
+        homeScreenContainer = findViewById(R.id.homeScreenContainer)
+        btnHome = findViewById(R.id.btnHome)
+        ivHeaderLogo = findViewById(R.id.ivHeaderLogo)
+        btnShieldLayout = findViewById(R.id.btnShieldLayout)
+        tvShieldCount = findViewById(R.id.tvShieldCount)
+        btnTabs = findViewById(R.id.btnTabs)
+        tvTabCount = findViewById(R.id.tvTabCount)
+        btnMenu = findViewById(R.id.btnMenu)
+        etHomeSearch = findViewById(R.id.etHomeSearch)
+        btnVoiceSearch = findViewById(R.id.btnVoiceSearch)
+        speedDialRecyclerView = findViewById(R.id.speedDialRecyclerView)
+
+        // Browser top bar elements
+        browserTopBar = findViewById(R.id.browserTopBar)
+        btnBrowserHome = findViewById(R.id.btnBrowserHome)
+        etBrowserUrl = findViewById(R.id.etBrowserUrl)
+        btnBrowserShieldLayout = findViewById(R.id.btnBrowserShieldLayout)
+        btnBrowserTabs = findViewById(R.id.btnBrowserTabs)
+        tvBrowserTabCount = findViewById(R.id.tvBrowserTabCount)
+        btnBrowserMenu = findViewById(R.id.btnBrowserMenu)
+        progressBar = findViewById(R.id.progressBar)
+
+        // Home Top Bar listeners
+        btnHome.setOnClickListener { returnToHome() }
+        btnShieldLayout.setOnClickListener { onToggleAdBlocker() }
+        btnTabs.setOnClickListener { showTabsDialog() }
+        btnMenu.setOnClickListener { showTvMenu() }
+
+        // Browser Top Bar listeners
+        btnBrowserHome.setOnClickListener { returnToHome() }
+        btnBrowserShieldLayout.setOnClickListener { onToggleAdBlocker() }
+        btnBrowserTabs.setOnClickListener { showTabsDialog() }
+        btnBrowserMenu.setOnClickListener { showTvMenu() }
+
+        // Home search listener
+        etHomeSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
+                val input = etHomeSearch.text.toString().trim()
+                if (input.isNotEmpty()) {
+                    loadUrl(input)
+                }
                 true
             } else {
                 false
             }
         }
 
-        btnMouseToggle.setOnClickListener { onToggleMousePointer() }
-        btnExtensions.setOnClickListener { onOpenExtensionManager() }
-        btnAdblockStats.setOnClickListener { onToggleAdBlocker() }
-        btnUserAgent.setOnClickListener { cycleUserAgent() }
-        btnOpacity.setOnClickListener {
-            val alpha = pipManager.cycleTranslucency(findViewById(R.id.rootLayout))
-            btnOpacity.text = "Alpha: ${(alpha * 100).toInt()}%"
+        // Browser URL listener
+        etBrowserUrl.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
+                val input = etBrowserUrl.text.toString().trim()
+                if (input.isNotEmpty()) {
+                    loadUrl(input)
+                }
+                true
+            } else {
+                false
+            }
         }
-        btnGeminiAi.setOnClickListener { toggleGeminiPanel() }
+
+        btnVoiceSearch.setOnClickListener { launchVoiceSearch() }
     }
 
     private fun initGeminiPanel() {
@@ -185,10 +233,15 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             context = this,
             onPageStarted = { url ->
                 runOnUiThread {
-                    currentPageUrl = url
-                    urlEditText.setText(url)
-                    progressBar.visibility = View.VISIBLE
-                    speedDialContainer.visibility = View.GONE
+                    // CRITICAL FIX: Only hide home screen if loading a REAL URL!
+                    // geckoSession.open fires on "about:blank" on startup - never hide home screen on blank!
+                    if (url.isNotEmpty() && url != "about:blank" && !url.startsWith("about:")) {
+                        currentPageUrl = url
+                        etBrowserUrl.setText(url)
+                        progressBar.visibility = View.VISIBLE
+                        homeScreenContainer.visibility = View.GONE
+                        browserTopBar.visibility = View.VISIBLE
+                    }
                 }
             },
             onPageFinished = {
@@ -213,7 +266,10 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
         val cbDelegate = HeliumContentBlockingDelegate(lifecycleScope) { count, _ ->
             runOnUiThread {
-                btnAdblockStats.text = "🛡️ $count"
+                if (count > 0) {
+                    tvShieldCount.visibility = View.VISIBLE
+                    tvShieldCount.text = "$count"
+                }
             }
         }
 
@@ -239,16 +295,82 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     private fun loadUrl(rawInput: String) {
-        // Microsoft Bing as default search engine
+        if (rawInput.isBlank()) return
+
         val url = when {
             rawInput.startsWith("http://") || rawInput.startsWith("https://") -> rawInput
             rawInput.contains(".") && !rawInput.contains(" ") -> "https://$rawInput"
-            else -> "https://www.bing.com/search?q=${android.net.Uri.encode(rawInput)}"
+            else -> openSearchManager.buildSearchUrl(rawInput)
         }
-        urlEditText.setText(url)
+
         currentPageUrl = url
+        etBrowserUrl.setText(url)
+        homeScreenContainer.visibility = View.GONE
+        browserTopBar.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
+
         geckoSession.loadUri(url)
-        speedDialContainer.visibility = View.GONE
+    }
+
+    private fun returnToHome() {
+        homeScreenContainer.visibility = View.VISIBLE
+        browserTopBar.visibility = View.GONE
+        progressBar.visibility = View.GONE
+        currentPageUrl = ""
+        etHomeSearch.setText("")
+        geckoSession.loadUri("about:blank")
+        etHomeSearch.requestFocus()
+    }
+
+    private fun showTvMenu() {
+        TvDialogs.showMenuDialog(
+            context = this,
+            onGeminiClick = { toggleGeminiPanel() },
+            onExtensionsClick = { onOpenExtensionManager() },
+            onPointerToggle = { onToggleMousePointer() },
+            onUserAgentClick = { cycleUserAgent() },
+            onSearchEngineClick = {
+                TvDialogs.showSearchEngineDialog(this, openSearchManager) { selected ->
+                    etHomeSearch.hint = "Search ${selected.shortName} or type URL"
+                }
+            },
+            onPipClick = { onTogglePipMode() },
+            onReloadClick = { geckoSession.reload() },
+            onClearDataClick = {
+                engineManager.clearBrowsingData()
+                Toast.makeText(this, "Browsing cache & cookies cleared!", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    private fun showTabsDialog() {
+        TvDialogs.showTabsDialog(this, 1) {
+            returnToHome()
+        }
+    }
+
+    private fun launchVoiceSearch() {
+        try {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH)
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Search Google or say a website URL...")
+            }
+            startActivityForResult(intent, 1001)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Voice search is not available on this device", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            val results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (!results.isNullOrEmpty()) {
+                val query = results[0]
+                etHomeSearch.setText(query)
+                loadUrl(query)
+            }
+        }
     }
 
     private fun cycleUserAgent() {
@@ -258,7 +380,6 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             UserAgentMode.MOBILE -> UserAgentMode.TV
         }
         engineManager.setUserAgentMode(geckoSession, currentUaMode)
-        btnUserAgent.text = "UA: ${currentUaMode.name}"
         geckoSession.reload()
         Toast.makeText(this, "Switched to ${currentUaMode.name} User-Agent", Toast.LENGTH_SHORT).show()
     }
@@ -274,10 +395,9 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     override fun onToggleMousePointer() {
         val active = virtualMouseOverlay.toggleMousePointer()
-        btnMouseToggle.text = if (active) "🎯 Pointer: ON" else "🎯 Focus Mode"
         Toast.makeText(
             this,
-            if (active) "Neon Pointer Activated" else "D-Pad Focus Mode Activated",
+            if (active) "🎯 Neon Pointer Activated" else "🎮 D-Pad Focus Mode Activated",
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -288,7 +408,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
 
     override fun onToggleAdBlocker() {
         val count = RustAdBlocker.getBlockedCount()
-        Toast.makeText(this, "Rust AdBlocker: $count ads & trackers blocked", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "🛡️ Rust AdBlocker: $count ads & trackers blocked", Toast.LENGTH_SHORT).show()
     }
 
     override fun onTogglePipMode() {
@@ -296,7 +416,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
     }
 
     override fun onOpenMenu() {
-        toolbarContainer.visibility = if (toolbarContainer.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        showTvMenu()
     }
 
     override fun onNavigateBack(): Boolean {
@@ -304,12 +424,8 @@ class MainActivity : AppCompatActivity(), TvActionListener {
             geminiPanel.visibility = View.GONE
             return true
         }
-        if (toolbarContainer.visibility == View.VISIBLE) {
-            toolbarContainer.visibility = View.GONE
-            return true
-        }
-        if (speedDialContainer.visibility == View.GONE) {
-            geckoSession.goBack()
+        if (homeScreenContainer.visibility == View.GONE) {
+            returnToHome()
             return true
         }
         return false
@@ -323,7 +439,7 @@ class MainActivity : AppCompatActivity(), TvActionListener {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         pipManager.onPictureInPictureModeChanged(isInPictureInPictureMode)
         if (isInPictureInPictureMode) {
-            toolbarContainer.visibility = View.GONE
+            browserTopBar.visibility = View.GONE
             virtualMouseOverlay.visibility = View.GONE
             geminiPanel.visibility = View.GONE
         } else {
